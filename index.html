@@ -38,11 +38,11 @@
   .rowbtn:hover { background:#FBF9F4; }
   .ev-name { font-size:13px; font-weight:600; }
   .ev-meta { font-size:11px; color:#777; }
-  .chip { font-size:10px; font-weight:700; letter-spacing:0.12em; padding:3px 8px; border-radius:3px; white-space:nowrap; }
-  .chip.g { background:var(--hi); color:var(--black); }
+  .chip { font-size:10px; font-weight:700; letter-spacing:0.12em; padding:3px 8px; border-radius:3px; white-space:nowrap; min-width:82px; text-align:center; flex:none; align-self:center; box-sizing:border-box; }
+  .chip.g { background:var(--hi); color:var(--black); border:1px solid var(--hi); }
   .chip.s { background:var(--white); color:var(--black); border:1px solid var(--black); }
   .chip.b { color:var(--gold); border:1px solid var(--gold); }
-  .chip.c { color:#999; padding:3px 0; }
+  .chip.c { color:#999; border:1px solid transparent; }
   .divline { border-top:1px solid var(--faint); }
   .matchlog { background:#FBF9F4; border-top:1px solid var(--faint); padding:8px 16px 12px; }
   .matchlog h4 { font-size:10px; letter-spacing:0.18em; color:#8A7430; text-transform:uppercase; margin:6px 0; }
@@ -59,7 +59,13 @@
   @media(min-width:640px){ .grid { grid-template-columns:1fr 1fr; } }
   .divcard { border:1px solid #E5DFD2; border-radius:4px; }
   .divbody { border-top:1px solid var(--faint); padding:8px 12px; font-size:13px; max-height:340px; overflow-y:auto; }
-  .divbody li { list-style:none; display:flex; justify-content:space-between; gap:8px; padding:3px 0; }
+  .divbody li { list-style:none; display:grid; grid-template-columns:minmax(0,1fr) 44px auto; align-items:center; column-gap:8px; padding:3px 0; }
+  .divbody li .who { display:flex; align-items:center; gap:6px; min-width:0; }
+  .divbody li .noc { justify-self:center; }
+  .pline { display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0; }
+  .pline .noc { flex:none; }
+  .defw { color:#999; font-size:11px; flex:none; }
+  td.score { text-align:right; }
   .divbody .sec { font-size:10px; letter-spacing:0.18em; color:#8A7430; text-transform:uppercase; margin:8px 0 4px; }
   details.entries summary { font-size:11px; color:#7A6420; cursor:pointer; margin-top:8px; }
   .toolbar { display:flex; justify-content:flex-end; margin-top:4px; }
@@ -322,7 +328,7 @@ function renderSearch() {
             html += '<table class="matches">' + log.map(m =>
               "<tr><td class=\"rnd\">" + esc(m.round) + "</td>" +
               '<td class="res ' + (m.won ? "w\">W" : "l\">L") + "</td>" +
-              "<td>" + (m.won ? "def. " : "lost to ") + esc(m.opp) + ' <span class="noc">' + esc(m.oppNoc) + "</span></td>" +
+              '<td><div class="pline"><span class="defw">' + (m.won ? "def." : "lost to") + "</span> " + esc(m.opp) + ' <span class="noc">' + esc(m.oppNoc) + "</span></div></td>" +
               '<td class="score">' + esc(m.method) + " " + esc(m.score) + "</td></tr>"
             ).join("") + "</table>";
           }
@@ -382,16 +388,16 @@ function renderEvents() {
           const mts = DB.matches.filter(m => S(m["EventID"]) === evId && S(m["Division"]) === div)
             .sort((a, b) => roundRank(a["Round"]) - roundRank(b["Round"]));
           html += '<div class="divbody"><div class="sec">Podium</div><ul>' +
-            medals.map(r => "<li><span>" + pic(r["Athlete"], r["NOC"], true) + esc(r["Athlete"]) + ' <span class="noc">' + esc(r["NOC"]) + "</span></span>" + chip(r["Placement"]) + "</li>").join("") + "</ul>";
+            medals.map(r => '<li><span class="who">' + pic(r["Athlete"], r["NOC"], true) + esc(r["Athlete"]) + '</span><span class="noc">' + esc(r["NOC"]) + "</span>" + chip(r["Placement"]) + "</li>").join("") + "</ul>";
           html += '<div class="sec">Matches</div>';
           if (!mts.length) html += '<p class="empty">No match data loaded for this division yet.</p>';
           else html += '<table class="matches">' + mts.map(m =>
             '<tr><td class="rnd">' + esc(S(m["Round"]).toUpperCase()) + "</td>" +
-            "<td>" + esc(m["Winner"]) + ' <span class="noc">' + esc(m["Winner NOC"]) + "</span> def. " +
-            esc(m["Loser"]) + ' <span class="noc">' + esc(m["Loser NOC"]) + "</span></td>" +
+            '<td><div class="pline">' + esc(m["Winner"]) + ' <span class="noc">' + esc(m["Winner NOC"]) + "</span></div>" +
+            '<div class="pline"><span class="defw">def.</span> ' + esc(m["Loser"]) + ' <span class="noc">' + esc(m["Loser NOC"]) + "</span></div></td>" +
             '<td class="score">' + esc(S(m["Method"]).toUpperCase()) + " " + esc(m["Score"]) + "</td></tr>").join("") + "</table>";
           html += '<details class="entries"><summary>Full entry list (' + rows.length + ")</summary><ul>" +
-            rows.map(r => "<li><span>" + pic(r["Athlete"], r["NOC"], true) + esc(r["Athlete"]) + ' <span class="noc">' + esc(r["NOC"]) + "</span></span>" + chip(r["Placement"]) + "</li>").join("") +
+            rows.map(r => '<li><span class="who">' + pic(r["Athlete"], r["NOC"], true) + esc(r["Athlete"]) + '</span><span class="noc">' + esc(r["NOC"]) + "</span>" + chip(r["Placement"]) + "</li>").join("") +
             "</ul></details></div>";
         }
         html += "</div>";
