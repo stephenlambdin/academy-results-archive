@@ -75,6 +75,11 @@
   .filters { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .filters button { font:inherit; font-size:11px; font-weight:600; padding:4px 10px; border-radius:99px; border:1px solid var(--line); background:var(--white); cursor:pointer; }
   .filters button.on { background:var(--black); color:var(--hi); border-color:var(--black); }
+  .yearbar { width:100%; display:flex; align-items:center; gap:12px; margin-top:20px; padding:8px 16px; background:var(--black); color:var(--white); border:none; border-left:6px solid var(--hi); border-radius:4px; cursor:pointer; font-family:inherit; }
+  .yearbar:first-of-type { margin-top:12px; }
+  .yeartxt { font-family:'Bebas Neue',sans-serif; font-size:26px; line-height:1; letter-spacing:0.06em; color:var(--hi); }
+  .yearbar .count { color:#AAA; }
+  .yearbar .tog { margin-left:auto; font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--hi); }
 </style>
 </head>
 <body>
@@ -226,6 +231,8 @@ let DB = null;
 let tab = "search";
 let query = "";
 let openKeys = new Set();
+let closedYears = new Set();
+let yearsInitialized = false;
 
 async function boot() {
   try {
@@ -333,7 +340,27 @@ function renderSearch() {
 function renderEvents() {
   let html = '<div class="toolbar"><a href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '" target="_blank" rel="noopener">Open the source sheet</a></div>';
   const evs = [...DB.events].sort((a, b) => S(b["Start Date"]).localeCompare(S(a["Start Date"])));
+  const byYear = new Map();
   evs.forEach(ev => {
+    const y = S(ev["Start Date"]).slice(0, 4) || "Undated";
+    if (!byYear.has(y)) byYear.set(y, []);
+    byYear.get(y).push(ev);
+  });
+  const years = [...byYear.keys()];
+  if (!yearsInitialized) {          // first visit: newest year open, older years collapsed
+    years.slice(1).forEach(y => closedYears.add(y));
+    yearsInitialized = true;
+  }
+  years.forEach(year => {
+    const group = byYear.get(year);
+    const closed = closedYears.has(year);
+    html += '<button class="yearbar" data-ytoggle="' + esc(year) + '"><span class="yeartxt">' + esc(year) + '</span>' +
+            '<span class="count">' + group.length + " event" + (group.length !== 1 ? "s" : "") + '</span>' +
+            '<span class="tog">' + (closed ? "+" : "–") + "</span></button>";
+    if (closed) return;
+    group.forEach(ev => renderEventCard(ev));
+  });
+  function renderEventCard(ev) {
     const evId = S(ev["EventID"]);
     const divs = [...new Set(DB.results.filter(r => S(r["EventID"]) === evId).map(r => S(r["Division"])))];
     const k = "ev@" + evId;
@@ -372,7 +399,7 @@ function renderEvents() {
       html += "</div>";
     }
     html += "</div>";
-  });
+  }
   return html;
 }
 
@@ -391,6 +418,11 @@ function render() {
   app.querySelectorAll("[data-toggle]").forEach(btn => btn.addEventListener("click", () => {
     const k = btn.getAttribute("data-toggle");
     openKeys.has(k) ? openKeys.delete(k) : openKeys.add(k);
+    render();
+  }));
+  app.querySelectorAll("[data-ytoggle]").forEach(btn => btn.addEventListener("click", () => {
+    const y = btn.getAttribute("data-ytoggle");
+    closedYears.has(y) ? closedYears.delete(y) : closedYears.add(y);
     render();
   }));
 }
