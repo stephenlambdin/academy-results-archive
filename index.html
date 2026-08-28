@@ -115,6 +115,52 @@
   .prior .rowbtn { opacity:0.72; }
   .prior .rowbtn:hover { opacity:1; }
   .acard .empty { padding:12px 16px; }
+  .ahead { width:100%; text-align:left; background:none; border:none; font:inherit; cursor:pointer; color:inherit; border-bottom:1px solid var(--faint); }
+  .ahead:hover { background:#FBF9F4; }
+  .acard.open .ahead { border-bottom:2px solid var(--hi); }
+  .caret { font-family:'Bebas Neue',sans-serif; font-size:24px; color:var(--gold); line-height:1; }
+  .quadline { display:flex; align-items:center; gap:10px; padding:8px 16px; flex-wrap:wrap; }
+  .quadline .qlabel { font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:0.1em; color:#8A7430; flex:none; }
+  .quadline .tally { display:flex; flex-wrap:wrap; gap:4px 6px; flex:1; min-width:0; }
+  .quadline .tally > span:not(.gcell) { font-size:10px; font-weight:700; letter-spacing:0.08em; padding:2px 7px; border-radius:3px; }
+  .quadline .gcell { border-left-color:var(--line); }
+  .quadline .gcell b { color:var(--black); }
+  .quadline .tg { background:var(--hi); color:var(--black); } .quadline .ts { background:var(--white); color:var(--black); border:1px solid var(--black); } .quadline .tb { border:1px solid var(--gold); color:var(--gold); }
+  .quadline .none { font-size:11px; color:#999; font-weight:500; }
+  .quadline .export { margin-left:auto; }
+  .gcell .tg, .gcell .ts, .gcell .tb { font-size:10px; font-weight:700; letter-spacing:0.08em; padding:2px 7px; border-radius:3px; }
+  .cycle .tally .tg { background:var(--hi); color:var(--black); } .cycle .tally .ts { background:var(--white); color:var(--black); } .cycle .tally .tb { border:1px solid var(--gold); color:var(--gold); }
+  /* phones */
+  @media (max-width:640px) {
+    .head-row { gap:10px; padding:14px 0 10px; }
+    .head-row img { width:56px; height:56px; }
+    h1 { font-size:30px; }
+    .stats { width:100%; margin-left:0; justify-content:space-between; text-align:left; gap:8px; }
+    .stat b { font-size:22px; }
+    nav { overflow-x:auto; }
+    nav button { font-size:15px; padding:8px 10px; white-space:nowrap; }
+    main { padding:14px 0 32px; }
+    .ahead, .acard .card-head { padding:10px 12px; }
+    .pic.lg { width:52px; height:52px; }
+    .aname { font-size:20px; }
+    .headright .count { display:none; }
+    .quadline { padding:8px 12px; }
+    .quadline .qlabel { width:100%; }
+    .quadline .export { margin-left:0; width:100%; text-align:center; padding:8px; }
+    .cycle { flex-wrap:wrap; font-size:13px; padding:6px 12px; }
+    .cycle .tally { margin-left:0; width:100%; justify-content:flex-start; }
+    .gcell { padding-left:6px; margin-left:2px; }
+    .rowbtn { padding:10px 12px; }
+    .prior summary { flex-wrap:wrap; gap:4px; padding:8px 12px; }
+    .prior summary .gsum { justify-content:flex-start; width:100%; }
+    .prior.sub summary, .prior.sub .rowbtn { padding-left:20px; }
+    .matchlog { padding:8px 12px 10px; }
+    table.matches { font-size:11px; }
+    td.score { width:70px; }
+    .chip { min-width:0; padding:3px 6px; font-size:9px; }
+    .card-head .aname { font-size:20px; }
+    .grid { padding:10px 12px; }
+  }
   .prior.sub summary { padding-left:28px; background:#F3EFE6; }
   .prior.sub .rowbtn { padding-left:28px; }
   .export { font:inherit; font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:5px 10px; border:1px solid var(--gold); border-radius:3px; background:none; color:#7A6420; cursor:pointer; white-space:nowrap; }
@@ -501,11 +547,15 @@ function renderAcademy() {
       const photo = S(r["Photo"]) ? '<img class="pic lg" src="' + esc(PHOTO_BASE + S(r["Photo"])) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;pic lg ph&quot;>' + esc(name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()) + '</div>\'">'
                                    : '<div class="pic lg ph">' + esc(name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()) + "</div>";
       const rk = KEY(name, noc);
-      html += '<div class="card acard"><div class="card-head"><div class="namewrap">' + photo +
+      const ak = "ath@" + rk, aopen = openKeys.has(ak);
+      const quad = rows.filter(x => dt(x) >= QUAD_START);
+      html += '<div class="card acard' + (aopen ? " open" : "") + '"><button class="card-head ahead" data-toggle="' + esc(ak) + '" aria-expanded="' + aopen + '"><div class="namewrap">' + photo +
         '<div><span class="aname">' + esc(name) + '</span> <span class="noc">' + esc(noc) + '</span>' +
         (S(r["Member No"]) ? '<div class="amember">Member ' + esc(r["Member No"]) + "</div>" : "") + "</div></div>" +
-        '<span class="headright"><span class="count">' + rows.length + " result" + (rows.length !== 1 ? "s" : "") + '</span>' +
-        '<button class="export" data-export="' + esc(rk) + '">Export PDF</button></span></div>';
+        '<span class="headright"><span class="count">' + rows.length + " result" + (rows.length !== 1 ? "s" : "") + '</span><span class="caret">' + (aopen ? "–" : "+") + "</span></span></button>";
+      html += '<div class="quadline"><span class="qlabel">2025–28 Quad</span><span class="tally">' + (gBreakdown(quad) || '<span class="none">No G-graded medals yet</span>') + '</span>' +
+        '<button class="export" data-export="' + esc(rk) + '">Export PDF</button></div>';
+      if (!aopen) { html += "</div>"; return; }
       html += '<div class="cycle">Since the ' + esc(RESET_LABEL) + ' reset<span class="tally">' + gBreakdown(cur) + "</span></div>";
       if (!cur.length) html += '<p class="empty">No results since the reset yet.</p>';
       cur.forEach(x => { html += resultRow(x, "ac@"); });
