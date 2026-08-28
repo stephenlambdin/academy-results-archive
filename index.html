@@ -98,6 +98,17 @@
   .cycle .tally .ts { background:var(--white); color:var(--black); }
   .cycle .tally .tb { border:1px solid var(--gold); color:var(--gold); }
   .cycle .tally .tn { color:#999; border:1px solid #444; }
+  .cycle .tally { flex-wrap:wrap; justify-content:flex-end; }
+  .gcell { display:inline-flex; align-items:center; gap:4px; padding-left:8px; margin-left:4px; border-left:1px solid #444; }
+  .gcell:first-child { border-left:none; padding-left:0; margin-left:0; }
+  .gcell b { font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:15px; letter-spacing:0.08em; color:var(--white); margin-right:2px; }
+  .prior summary .gsum { display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-end; }
+  .prior summary .gcell { border-left-color:var(--line); }
+  .prior summary .gcell b { color:#8A7430; }
+  .prior summary .gcell span { font-size:9px; font-weight:700; letter-spacing:0.08em; padding:1px 6px; border-radius:3px; }
+  .prior summary .tg { background:var(--hi); color:var(--black); }
+  .prior summary .ts { background:var(--white); color:var(--black); border:1px solid var(--black); }
+  .prior summary .tb { border:1px solid var(--gold); color:var(--gold); }
   .prior { border-top:1px dashed var(--line); background:#FAF8F3; }
   .prior summary { list-style:none; cursor:pointer; padding:8px 16px; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#8A7430; display:flex; justify-content:space-between; }
   .prior summary::-webkit-details-marker { display:none; }
@@ -154,6 +165,37 @@ const PHOTO_BASE = "photos/";
    current cycle on the Academy Athletes tab; earlier results are folded away. */
 const RANKINGS_RESET = "2026-06-01";
 const RESET_LABEL = "June 2026";
+
+/* WT G-grade for an event. Explicit "G1", "G2", "G4" in the Level column wins;
+   named tiers map to their grade. Domestic events (National, Team Trials) and
+   ungraded internationals return null and are left out of the G breakdown. */
+const G_BY_LEVEL = [
+  [/olympic games/i, 20], [/world championships/i, 14], [/grand prix final/i, 12],
+  [/grand prix challenge/i, 4], [/grand prix/i, 8], [/presidents cup/i, 2],
+];
+function gLevel(ev) {
+  const lv = S(ev && ev["Level"]);
+  const m = lv.match(/\bG[- ]?(\d+)\b/i);
+  if (m) return Number(m[1]);
+  for (const [re, g] of G_BY_LEVEL) if (re.test(lv)) return g;
+  return null;
+}
+function gBreakdown(rows) {
+  const byG = new Map();
+  rows.forEach(r => {
+    const p = Number(r["Placement"]);
+    if (!(p >= 1 && p <= 3)) return;
+    const g = gLevel(DB.evById[S(r["EventID"])]);
+    if (g === null) return;
+    if (!byG.has(g)) byG.set(g, [0, 0, 0]);
+    byG.get(g)[p - 1]++;
+  });
+  return [...byG.entries()].sort((a, b) => b[0] - a[0]).map(([g, c]) =>
+    '<span class="gcell"><b>G' + g + "</b>" +
+    (c[0] ? '<span class="tg">' + c[0] + " GOLD</span>" : "") +
+    (c[1] ? '<span class="ts">' + c[1] + " SILVER</span>" : "") +
+    (c[2] ? '<span class="tb">' + c[2] + " BRONZE</span>" : "") + "</span>").join("");
+}
 
 /* ---------------- data loading (gviz JSON) ---------------- */
 async function loadTab(name) {
@@ -399,7 +441,7 @@ function resultRow(r, keyPrefix) {
 }
 function renderAcademy() {
   if (!DB.roster || !DB.roster.length) return '<p class="hint">No Academy athletes listed yet. Add rows to the Roster tab of the sheet (Display Name, Member No, Gender, NOC, Photo).</p>';
-  let html = '<p class="hint" style="margin-top:0">Rankings reset in ' + esc(RESET_LABEL) + '. Results from the reset onward are shown first for each athlete; earlier results are folded underneath.</p>';
+  let html = '<p class="hint" style="margin-top:0">Rankings reset in ' + esc(RESET_LABEL) + '. Results from the reset onward are shown first for each athlete; earlier results are folded underneath. Medal counts are broken down by WT G-grade; domestic events are not counted.</p>';
   const groups = [["MEN", r => /^m/i.test(S(r["Gender"]))], ["WOMEN", r => /^f|^w/i.test(S(r["Gender"]))], ["UNASSIGNED", r => !/^m|^f|^w/i.test(S(r["Gender"]))]];
   groups.forEach(([label, test]) => {
     const list = DB.roster.filter(test).sort((a, b) => S(a["Display Name"]).localeCompare(S(b["Display Name"])));
@@ -412,22 +454,16 @@ function renderAcademy() {
       const cur = rows.filter(x => dt(x) >= RANKINGS_RESET), prior = rows.filter(x => dt(x) < RANKINGS_RESET);
       const photo = S(r["Photo"]) ? '<img class="pic lg" src="' + esc(PHOTO_BASE + S(r["Photo"])) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;pic lg ph&quot;>' + esc(name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()) + '</div>\'">'
                                    : '<div class="pic lg ph">' + esc(name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()) + "</div>";
-      const tally = [1, 2, 3].map(p => cur.filter(x => Number(x["Placement"]) === p).length);
-      const other = cur.length - tally[0] - tally[1] - tally[2];
       html += '<div class="card acard"><div class="card-head"><div class="namewrap">' + photo +
         '<div><span class="aname">' + esc(name) + '</span> <span class="noc">' + esc(noc) + '</span>' +
         (S(r["Member No"]) ? '<div class="amember">Member ' + esc(r["Member No"]) + "</div>" : "") + "</div></div>" +
         '<span class="count">' + rows.length + " result" + (rows.length !== 1 ? "s" : "") + "</span></div>";
-      html += '<div class="cycle">Since the ' + esc(RESET_LABEL) + ' reset<span class="tally">' +
-        (tally[0] ? '<span class="tg">' + tally[0] + " GOLD</span>" : "") +
-        (tally[1] ? '<span class="ts">' + tally[1] + " SILVER</span>" : "") +
-        (tally[2] ? '<span class="tb">' + tally[2] + " BRONZE</span>" : "") +
-        (other ? '<span class="tn">' + other + " COMPETED</span>" : "") + "</span></div>";
+      html += '<div class="cycle">Since the ' + esc(RESET_LABEL) + ' reset<span class="tally">' + gBreakdown(cur) + "</span></div>";
       if (!cur.length) html += '<p class="empty">No results since the reset yet.</p>';
       cur.forEach(x => { html += resultRow(x, "ac@"); });
       if (prior.length) {
         const pk = "prior@" + KEY(name, noc);
-        html += '<details class="prior"' + (openKeys.has(pk) ? " open" : "") + '><summary data-ptoggle="' + esc(pk) + '"><span>Before the reset</span><span>' + prior.length + " result" + (prior.length !== 1 ? "s" : "") + "</span></summary>";
+        html += '<details class="prior"' + (openKeys.has(pk) ? " open" : "") + '><summary data-ptoggle="' + esc(pk) + '"><span>Before the reset · ' + prior.length + " result" + (prior.length !== 1 ? "s" : "") + '</span><span class="gsum">' + gBreakdown(prior) + "</span></summary>";
         prior.forEach(x => { html += resultRow(x, "ap@"); });
         html += "</details>";
       }
