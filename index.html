@@ -548,7 +548,9 @@ function renderAcademy() {
   groups.forEach(([label, test]) => {
     const list = DB.roster.filter(test).sort((a, b) => S(a["Display Name"]).localeCompare(S(b["Display Name"])));
     if (!list.length) return;
-    html += '<div class="yearbar" style="cursor:default"><span class="yeartxt">' + label + '</span><span class="count">' + list.length + " athlete" + (list.length !== 1 ? "s" : "") + "</span></div>";
+    const gk = "grp@" + label, gopen = openKeys.has(gk);      // collapsed unless opened
+    html += '<button class="yearbar" data-toggle="' + esc(gk) + '" aria-expanded="' + gopen + '"><span class="yeartxt">' + label + '</span><span class="count">' + list.length + " athlete" + (list.length !== 1 ? "s" : "") + '</span><span class="tog">' + (gopen ? "–" : "+") + "</span></button>";
+    if (!gopen) return;
     list.forEach(r => {
       const name = S(r["Display Name"]), noc = S(r["NOC"]);
       const rows = rosterResults(r);
