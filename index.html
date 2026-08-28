@@ -276,6 +276,7 @@ const G_BY_LEVEL = [
 ];
 function gLevel(ev) {
   const lv = S(ev && ev["Level"]);
+  if (/under[ -]?21|\bu21\b/i.test(lv + " " + S(ev && ev["Event Name"]))) return 4;   // U21 World Championships
   const m = lv.match(/\bG[- ]?(\d+)\b/i);
   if (m) return Number(m[1]);
   for (const [re, g] of G_BY_LEVEL) if (re.test(lv)) return g;
