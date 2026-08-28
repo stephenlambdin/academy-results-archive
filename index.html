@@ -134,7 +134,17 @@
     .ps-head .meta { font-size:8.5pt; color:#555; margin-top:2px; }
     .ps-head img.pic { width:64px; height:64px; margin-left:auto; border:3px solid #C3A141; border-radius:50%; object-fit:cover; }
     .ps-band { display:flex; align-items:center; gap:10px; margin-top:12px; padding:5px 10px; background:#000; color:#ECBE43; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.1em; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .ps-band .tally { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .ps-band .sub { margin-left:auto; font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:600; letter-spacing:0.12em; color:#C3A141; text-transform:uppercase; }
+    .ps-page { page-break-before:always; break-before:page; }
+    table.ps tr.mark td { background:#F3EFE6; color:#8A7430; font-family:'Bebas Neue',sans-serif; font-size:10pt; letter-spacing:0.14em; padding:4px 6px; border-top:2px solid #C3A141; border-bottom:2px solid #C3A141; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    table.ps.gt { width:60%; margin-top:6px; }
+    table.ps.gt th { text-align:right; font-size:7.5pt; letter-spacing:0.14em; text-transform:uppercase; color:#8A7430; padding:3px 8px; border-bottom:2px solid #C3A141; }
+    table.ps.gt th:first-child { text-align:left; }
+    table.ps.gt td { text-align:right; padding:4px 8px; font-size:10pt; }
+    table.ps.gt td.gr { text-align:left; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.08em; }
+    table.ps.gt td.mg { color:#8A7430; font-weight:700; } table.ps.gt td.ms { font-weight:700; } table.ps.gt td.mb { color:#A0813A; font-weight:700; }
+    table.ps.gt td.tot { font-weight:700; }
+    table.ps.gt tr.sum td { border-top:2px solid #000; border-bottom:none; font-weight:700; }
     .ps-band .gcell b { color:#fff; font-size:11pt; }
     .ps-band .tally span:not(.gcell) { font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:700; letter-spacing:0.08em; padding:1px 6px; border-radius:3px; }
     .ps-band .tg { background:#ECBE43; color:#000; } .ps-band .ts { background:#fff; color:#000; } .ps-band .tb { border:1px solid #C3A141; color:#C3A141; }
@@ -518,50 +528,92 @@ function renderAcademy() {
   return html;
 }
 
-/* ---------------- one-page PDF export ---------------- */
+/* ---------------- two-page PDF export ---------------- */
+const QUAD_START = "2025-01-01";     // Olympic quad: Jan 1 2025 through LA 2028
+function gStats(rows) {
+  const m = new Map();
+  rows.forEach(x => {
+    const g = gLevel(DB.evById[S(x["EventID"])]);
+    if (g === null) return;
+    if (!m.has(g)) m.set(g, { ev: 0, m: [0, 0, 0] });
+    const o = m.get(g); o.ev++;
+    const p = Number(x["Placement"]); if (p >= 1 && p <= 3) o.m[p - 1]++;
+  });
+  return [...m.entries()].sort((a, b) => b[0] - a[0]);
+}
 function exportAthlete(rk) {
   const r = DB.roster.find(x => KEY(x["Display Name"], x["NOC"]) === rk);
   if (!r) return;
   const name = S(r["Display Name"]), noc = S(r["NOC"]);
-  const rows = rosterResults(r);
+  const rows = rosterResults(r);                       // newest first
   const dt = x => S(DB.evById[S(x["EventID"])] && DB.evById[S(x["EventID"])]["Start Date"]);
-  const cur = rows.filter(x => dt(x) >= RANKINGS_RESET);
-  const y26 = rows.filter(x => dt(x) < RANKINGS_RESET && dt(x).slice(0, 4) === SEASON_YEAR);
-  const old = rows.filter(x => dt(x).slice(0, 4) < SEASON_YEAR);
-  const MAX = 24;                       // keeps the sheet to one page (letter, 0.5in margins)
+  const seasonStart = SEASON_YEAR + "-01-01";
+  const season = rows.filter(x => dt(x) >= seasonStart);
+  const quadRest = rows.filter(x => dt(x) >= QUAD_START && dt(x) < seasonStart);
+  const quadAll = rows.filter(x => dt(x) >= QUAD_START);
+  const MAX = 26;                                      // page-1 row budget (letter, 0.5in margins)
   let budget = MAX;
-  const table = list => {
-    const shown = list.slice(0, Math.max(0, budget)); budget -= shown.length;
-    let h = '<table class="ps">' + shown.map(x => {
-      const ev = DB.evById[S(x["EventID"])] || {}; const p = Number(x["Placement"]);
-      const lab = p === 1 ? "GOLD" : p === 2 ? "SILVER" : p === 3 ? "BRONZE" : "Competed";
-      return '<tr><td class="d">' + esc(fmtDate(ev["Start Date"])) + '</td><td>' + esc(ev["Event Name"] || "") + '</td><td class="dv">' + esc(x["Division"]) + '</td><td class="lv">' + esc(ev["Level"] || "") + '</td><td class="pl ' + (p >= 1 && p <= 3 ? "g" : "c") + '">' + lab + "</td></tr>";
-    }).join("") + "</table>";
-    if (list.length > shown.length) h += '<div class="ps-more">+ ' + (list.length - shown.length) + " earlier results not shown</div>";
-    return h;
+  const tr = x => {
+    const ev = DB.evById[S(x["EventID"])] || {}; const p = Number(x["Placement"]);
+    const lab = p === 1 ? "GOLD" : p === 2 ? "SILVER" : p === 3 ? "BRONZE" : "Competed";
+    return '<tr><td class="d">' + esc(fmtDate(ev["Start Date"])) + '</td><td>' + esc(ev["Event Name"] || "") + '</td><td class="dv">' + esc(x["Division"]) + '</td><td class="lv">' + esc(ev["Level"] || "") + '</td><td class="pl ' + (p >= 1 && p <= 3 ? "g" : "c") + '">' + lab + "</td></tr>";
   };
-  const band = (label, list) => '<div class="ps-band">' + label + '<span class="tally">' + (gBreakdown(list) || '<span style="color:#888;font-family:Montserrat,sans-serif;font-size:7.5pt">no G-graded medals</span>') + "</span></div>";
-  const crest = document.querySelector("header img");
-  const photo = S(r["Photo"]) ? '<img class="pic" src="' + esc(PHOTO_BASE + S(r["Photo"])) + '" alt="" onerror="this.remove()">' : "";
-  const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-  let h = '<div class="ps-head">' + (crest ? '<img class="crest" src="' + crest.src + '" alt="">' : "") +
+  const marker = '<tr class="mark"><td colspan="5">Rankings reset · ' + esc(RESET_LABEL) + "</td></tr>";
+  let h = '<div class="ps-head">' + crestImg() +
     '<div><div class="eyebrow">USATKD NATIONAL ACADEMY · ' + SEASON_YEAR + ' ATHLETE REVIEW</div><h1>' + esc(name) + '</h1>' +
-    '<div class="meta">' + esc(noc) + (S(r["Member No"]) ? " · Member " + esc(r["Member No"]) : "") + " · " + rows.length + " archived result" + (rows.length !== 1 ? "s" : "") + "</div></div>" + photo + "</div>";
-  h += band("Since the " + esc(RESET_LABEL) + " reset", cur) + (cur.length ? table(cur) : '<div class="ps-more">No results since the reset.</div>');
-  h += band("Full " + SEASON_YEAR + " season", cur.concat(y26)) + (y26.length ? table(y26) : '<div class="ps-more">No other ' + SEASON_YEAR + ' results before the reset.</div>');
-  if (old.length) h += band("Before " + SEASON_YEAR, old) + table(old);
-  h += '<div class="ps-foot"><span>Academy Results Archive · medal counts by WT G-grade, domestic events excluded</span><span>Generated ' + esc(today) + "</span></div>";
+    '<div class="meta">' + esc(noc) + (S(r["Member No"]) ? " · Member " + esc(r["Member No"]) : "") + "</div></div>" +
+    (S(r["Photo"]) ? '<img class="pic" src="' + esc(PHOTO_BASE + S(r["Photo"])) + '" alt="" onerror="this.remove()">' : "") + "</div>";
+  h += '<div class="ps-band">Competition Results<span class="sub">' + SEASON_YEAR + " season · newest first</span></div>";
+  let body = "", placed = false;
+  if (!season.length) body += marker;
+  season.forEach(x => {
+    if (!placed && dt(x) < RANKINGS_RESET) { body += marker; placed = true; }
+    if (budget-- > 0) body += tr(x);
+  });
+  if (season.length && !placed) body += marker;         // every season row is post-reset
+  h += '<table class="ps">' + body + "</table>";
+  if (!season.length) h += '<div class="ps-more">No ' + SEASON_YEAR + " results in the archive.</div>";
+  h += '<div class="ps-band">Remaining Olympic Quad Results<span class="sub">January 1, 2025 through December 31, ' + (Number(SEASON_YEAR) - 1) + "</span></div>";
+  if (!quadRest.length) h += '<div class="ps-more">No results in this period.</div>';
+  else {
+    const shown = quadRest.slice(0, Math.max(0, budget)); budget -= shown.length;
+    h += '<table class="ps">' + shown.map(tr).join("") + "</table>";
+    if (quadRest.length > shown.length) h += '<div class="ps-more">+ ' + (quadRest.length - shown.length) + " earlier results not shown (see the archive)</div>";
+  }
+  h += '<div class="ps-foot"><span>Academy Results Archive · page 1 of 2</span><span>Generated ' + esc(today()) + "</span></div>";
+  /* ---- page 2: breakdown by grade ---- */
+  const gtable = (title, sub, list) => {
+    const st = gStats(list);
+    let t = '<div class="ps-band">' + title + '<span class="sub">' + sub + "</span></div>";
+    if (!st.length) return t + '<div class="ps-more">No G-graded events in this period.</div>';
+    const tot = { ev: 0, m: [0, 0, 0] };
+    t += '<table class="ps gt"><tr class="hd"><th>Grade</th><th>Events</th><th>Gold</th><th>Silver</th><th>Bronze</th><th>Medals</th></tr>';
+    st.forEach(([g, o]) => {
+      tot.ev += o.ev; o.m.forEach((v, i) => tot.m[i] += v);
+      const tm = o.m[0] + o.m[1] + o.m[2];
+      t += '<tr><td class="gr">G' + g + '</td><td>' + o.ev + '</td><td class="mg">' + (o.m[0] || "") + '</td><td class="ms">' + (o.m[1] || "") + '</td><td class="mb">' + (o.m[2] || "") + '</td><td class="tot">' + (tm || "") + "</td></tr>";
+    });
+    const ttm = tot.m[0] + tot.m[1] + tot.m[2];
+    t += '<tr class="sum"><td class="gr">Total</td><td>' + tot.ev + '</td><td class="mg">' + (tot.m[0] || "") + '</td><td class="ms">' + (tot.m[1] || "") + '</td><td class="mb">' + (tot.m[2] || "") + '</td><td class="tot">' + (ttm || "") + "</td></tr></table>";
+    return t;
+  };
+  h += '<div class="ps-page"><div class="ps-head"><div><div class="eyebrow">USATKD NATIONAL ACADEMY · ' + SEASON_YEAR + ' ATHLETE REVIEW</div><h1>' + esc(name) + '</h1><div class="meta">Results by event grade · WT G-graded events only, domestic events excluded</div></div></div>';
+  h += gtable(SEASON_YEAR + " Season", "January 1 through December 31, " + SEASON_YEAR, season);
+  h += gtable("2025–2028 Olympic Quad", "January 1, 2025 to date", quadAll);
+  h += '<div class="ps-foot"><span>Academy Results Archive · page 2 of 2</span><span>Generated ' + esc(today()) + "</span></div></div>";
   let ps = document.getElementById("printsheet");
   if (!ps) { ps = document.createElement("div"); ps.id = "printsheet"; document.body.appendChild(ps); }
   ps.innerHTML = h;
   const prevTitle = document.title;
-  document.title = name.replace(/\s+/g, "_") + "_" + SEASON_YEAR + "_Review";   // becomes the default PDF filename
+  document.title = name.replace(/\s+/g, "_") + "_" + SEASON_YEAR + "_Review";   // default PDF filename
   const done = () => { document.title = prevTitle; window.removeEventListener("afterprint", done); };
   window.addEventListener("afterprint", done);
   const imgs = [...ps.querySelectorAll("img")].filter(i => !i.complete);
   if (!imgs.length) window.print();
   else { let n = imgs.length; imgs.forEach(i => { i.onload = i.onerror = () => { if (--n === 0) window.print(); }; }); }
 }
+function crestImg() { const c = document.querySelector("header img"); return c ? '<img class="crest" src="' + c.src + '" alt="">' : ""; }
+function today() { return new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }); }
 
 /* ---------------- events browser ---------------- */
 function renderEvents() {
