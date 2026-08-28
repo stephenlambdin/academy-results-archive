@@ -115,6 +115,39 @@
   .prior .rowbtn { opacity:0.72; }
   .prior .rowbtn:hover { opacity:1; }
   .acard .empty { padding:12px 16px; }
+  .prior.sub summary { padding-left:28px; background:#F3EFE6; }
+  .prior.sub .rowbtn { padding-left:28px; }
+  .export { font:inherit; font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:5px 10px; border:1px solid var(--gold); border-radius:3px; background:none; color:#7A6420; cursor:pointer; white-space:nowrap; }
+  .export:hover { background:var(--hi); color:var(--black); border-color:var(--hi); }
+  .headright { display:flex; align-items:center; gap:10px; }
+  /* print sheet */
+  #printsheet { display:none; }
+  @media print {
+    @page { size:letter; margin:0.5in; }
+    body > *:not(#printsheet) { display:none !important; }
+    body { background:#fff; }
+    #printsheet { display:block; color:#000; font-family:'Montserrat','Helvetica Neue',Arial,sans-serif; font-size:9.5pt; }
+    .ps-head { display:flex; align-items:center; gap:14px; border-bottom:3px solid #C3A141; padding-bottom:10px; }
+    .ps-head img.crest { width:60px; height:60px; }
+    .ps-head .eyebrow { color:#8A7430; font-size:8pt; font-weight:700; letter-spacing:0.28em; }
+    .ps-head h1 { font-family:'Bebas Neue',sans-serif; font-size:26pt; line-height:1; letter-spacing:0.04em; margin:2px 0 0; }
+    .ps-head .meta { font-size:8.5pt; color:#555; margin-top:2px; }
+    .ps-head img.pic { width:64px; height:64px; margin-left:auto; border:3px solid #C3A141; border-radius:50%; object-fit:cover; }
+    .ps-band { display:flex; align-items:center; gap:10px; margin-top:12px; padding:5px 10px; background:#000; color:#ECBE43; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.1em; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .ps-band .tally { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .ps-band .gcell b { color:#fff; font-size:11pt; }
+    .ps-band .tally span:not(.gcell) { font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:700; letter-spacing:0.08em; padding:1px 6px; border-radius:3px; }
+    .ps-band .tg { background:#ECBE43; color:#000; } .ps-band .ts { background:#fff; color:#000; } .ps-band .tb { border:1px solid #C3A141; color:#C3A141; }
+    table.ps { width:100%; border-collapse:collapse; margin-top:4px; }
+    table.ps td { padding:3px 6px; border-bottom:1px solid #E5DFD2; vertical-align:top; }
+    table.ps td.d { width:78px; color:#555; white-space:nowrap; }
+    table.ps td.dv { width:120px; white-space:nowrap; }
+    table.ps td.lv { width:110px; color:#555; }
+    table.ps td.pl { width:66px; text-align:right; font-weight:700; letter-spacing:0.1em; font-size:8pt; }
+    table.ps td.pl.g { color:#8A7430; } table.ps td.pl.c { color:#999; font-weight:500; }
+    .ps-more { font-size:8pt; color:#777; padding:4px 6px; }
+    .ps-foot { margin-top:14px; border-top:1px solid #C3A141; padding-top:6px; font-size:7.5pt; color:#777; letter-spacing:0.1em; text-transform:uppercase; display:flex; justify-content:space-between; }
+  }
 </style>
 </head>
 <body>
@@ -165,6 +198,7 @@ const PHOTO_BASE = "photos/";
    current cycle on the Academy Athletes tab; earlier results are folded away. */
 const RANKINGS_RESET = "2026-06-01";
 const RESET_LABEL = "June 2026";
+const SEASON_YEAR = RANKINGS_RESET.slice(0, 4);
 
 /* WT G-grade for an event. Explicit "G1", "G2", "G4" in the Level column wins;
    named tiers map to their grade. Domestic events (National, Team Trials) and
@@ -441,7 +475,7 @@ function resultRow(r, keyPrefix) {
 }
 function renderAcademy() {
   if (!DB.roster || !DB.roster.length) return '<p class="hint">No Academy athletes listed yet. Add rows to the Roster tab of the sheet (Display Name, Member No, Gender, NOC, Photo).</p>';
-  let html = '<p class="hint" style="margin-top:0">Rankings reset in ' + esc(RESET_LABEL) + '. Results from the reset onward are shown first for each athlete; earlier results are folded underneath. Medal counts are broken down by WT G-grade; domestic events are not counted.</p>';
+  let html = '<p class="hint" style="margin-top:0">Rankings reset in ' + esc(RESET_LABEL) + '. Results from the reset onward are shown first for each athlete. Open "Full ' + SEASON_YEAR + ' results" for the rest of the season, and "Before ' + SEASON_YEAR + '" inside it for earlier years. Medal counts are broken down by WT G-grade; domestic events are not counted. Export PDF prints a one-page review sheet.</p>';
   const groups = [["MEN", r => /^m/i.test(S(r["Gender"]))], ["WOMEN", r => /^f|^w/i.test(S(r["Gender"]))], ["UNASSIGNED", r => !/^m|^f|^w/i.test(S(r["Gender"]))]];
   groups.forEach(([label, test]) => {
     const list = DB.roster.filter(test).sort((a, b) => S(a["Display Name"]).localeCompare(S(b["Display Name"])));
@@ -451,26 +485,82 @@ function renderAcademy() {
       const name = S(r["Display Name"]), noc = S(r["NOC"]);
       const rows = rosterResults(r);
       const dt = x => S(DB.evById[S(x["EventID"])] && DB.evById[S(x["EventID"])]["Start Date"]);
-      const cur = rows.filter(x => dt(x) >= RANKINGS_RESET), prior = rows.filter(x => dt(x) < RANKINGS_RESET);
+      const cur = rows.filter(x => dt(x) >= RANKINGS_RESET);
+      const y26 = rows.filter(x => dt(x) < RANKINGS_RESET && dt(x).slice(0, 4) === SEASON_YEAR);
+      const old = rows.filter(x => dt(x).slice(0, 4) < SEASON_YEAR);
       const photo = S(r["Photo"]) ? '<img class="pic lg" src="' + esc(PHOTO_BASE + S(r["Photo"])) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;pic lg ph&quot;>' + esc(name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()) + '</div>\'">'
                                    : '<div class="pic lg ph">' + esc(name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase()) + "</div>";
+      const rk = KEY(name, noc);
       html += '<div class="card acard"><div class="card-head"><div class="namewrap">' + photo +
         '<div><span class="aname">' + esc(name) + '</span> <span class="noc">' + esc(noc) + '</span>' +
         (S(r["Member No"]) ? '<div class="amember">Member ' + esc(r["Member No"]) + "</div>" : "") + "</div></div>" +
-        '<span class="count">' + rows.length + " result" + (rows.length !== 1 ? "s" : "") + "</span></div>";
+        '<span class="headright"><span class="count">' + rows.length + " result" + (rows.length !== 1 ? "s" : "") + '</span>' +
+        '<button class="export" data-export="' + esc(rk) + '">Export PDF</button></span></div>';
       html += '<div class="cycle">Since the ' + esc(RESET_LABEL) + ' reset<span class="tally">' + gBreakdown(cur) + "</span></div>";
       if (!cur.length) html += '<p class="empty">No results since the reset yet.</p>';
       cur.forEach(x => { html += resultRow(x, "ac@"); });
-      if (prior.length) {
-        const pk = "prior@" + KEY(name, noc);
-        html += '<details class="prior"' + (openKeys.has(pk) ? " open" : "") + '><summary data-ptoggle="' + esc(pk) + '"><span>Before the reset · ' + prior.length + " result" + (prior.length !== 1 ? "s" : "") + '</span><span class="gsum">' + gBreakdown(prior) + "</span></summary>";
-        prior.forEach(x => { html += resultRow(x, "ap@"); });
+      if (y26.length || old.length) {
+        const fk = "full@" + rk;
+        html += '<details class="prior"' + (openKeys.has(fk) ? " open" : "") + '><summary data-ptoggle="' + esc(fk) + '"><span>Full ' + SEASON_YEAR + ' results · ' + (cur.length + y26.length) + " result" + (cur.length + y26.length !== 1 ? "s" : "") + '</span><span class="gsum">' + gBreakdown(cur.concat(y26)) + "</span></summary>";
+        if (!y26.length) html += '<p class="empty">No other ' + SEASON_YEAR + ' results before the reset.</p>';
+        y26.forEach(x => { html += resultRow(x, "ay@"); });
+        if (old.length) {
+          const ok = "old@" + rk;
+          html += '<details class="prior sub"' + (openKeys.has(ok) ? " open" : "") + '><summary data-ptoggle="' + esc(ok) + '"><span>Before ' + SEASON_YEAR + ' · ' + old.length + " result" + (old.length !== 1 ? "s" : "") + '</span><span class="gsum">' + gBreakdown(old) + "</span></summary>";
+          old.forEach(x => { html += resultRow(x, "ap@"); });
+          html += "</details>";
+        }
         html += "</details>";
       }
       html += "</div>";
     });
   });
   return html;
+}
+
+/* ---------------- one-page PDF export ---------------- */
+function exportAthlete(rk) {
+  const r = DB.roster.find(x => KEY(x["Display Name"], x["NOC"]) === rk);
+  if (!r) return;
+  const name = S(r["Display Name"]), noc = S(r["NOC"]);
+  const rows = rosterResults(r);
+  const dt = x => S(DB.evById[S(x["EventID"])] && DB.evById[S(x["EventID"])]["Start Date"]);
+  const cur = rows.filter(x => dt(x) >= RANKINGS_RESET);
+  const y26 = rows.filter(x => dt(x) < RANKINGS_RESET && dt(x).slice(0, 4) === SEASON_YEAR);
+  const old = rows.filter(x => dt(x).slice(0, 4) < SEASON_YEAR);
+  const MAX = 30;                       // keeps the sheet to one page
+  let budget = MAX;
+  const table = list => {
+    const shown = list.slice(0, Math.max(0, budget)); budget -= shown.length;
+    let h = '<table class="ps">' + shown.map(x => {
+      const ev = DB.evById[S(x["EventID"])] || {}; const p = Number(x["Placement"]);
+      const lab = p === 1 ? "GOLD" : p === 2 ? "SILVER" : p === 3 ? "BRONZE" : "Competed";
+      return '<tr><td class="d">' + esc(fmtDate(ev["Start Date"])) + '</td><td>' + esc(ev["Event Name"] || "") + '</td><td class="dv">' + esc(x["Division"]) + '</td><td class="lv">' + esc(ev["Level"] || "") + '</td><td class="pl ' + (p >= 1 && p <= 3 ? "g" : "c") + '">' + lab + "</td></tr>";
+    }).join("") + "</table>";
+    if (list.length > shown.length) h += '<div class="ps-more">+ ' + (list.length - shown.length) + " earlier results not shown</div>";
+    return h;
+  };
+  const band = (label, list) => '<div class="ps-band">' + label + '<span class="tally">' + (gBreakdown(list) || '<span style="color:#888;font-family:Montserrat,sans-serif;font-size:7.5pt">no G-graded medals</span>') + "</span></div>";
+  const crest = document.querySelector("header img");
+  const photo = S(r["Photo"]) ? '<img class="pic" src="' + esc(PHOTO_BASE + S(r["Photo"])) + '" alt="" onerror="this.remove()">' : "";
+  const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  let h = '<div class="ps-head">' + (crest ? '<img class="crest" src="' + crest.src + '" alt="">' : "") +
+    '<div><div class="eyebrow">USATKD NATIONAL ACADEMY · ' + SEASON_YEAR + ' ATHLETE REVIEW</div><h1>' + esc(name) + '</h1>' +
+    '<div class="meta">' + esc(noc) + (S(r["Member No"]) ? " · Member " + esc(r["Member No"]) : "") + " · " + rows.length + " archived result" + (rows.length !== 1 ? "s" : "") + "</div></div>" + photo + "</div>";
+  h += band("Since the " + esc(RESET_LABEL) + " reset", cur) + (cur.length ? table(cur) : '<div class="ps-more">No results since the reset.</div>');
+  h += band("Full " + SEASON_YEAR + " season", cur.concat(y26)) + (y26.length ? table(y26) : '<div class="ps-more">No other ' + SEASON_YEAR + ' results before the reset.</div>');
+  if (old.length) h += band("Before " + SEASON_YEAR, old) + table(old);
+  h += '<div class="ps-foot"><span>Academy Results Archive · medal counts by WT G-grade, domestic events excluded</span><span>Generated ' + esc(today) + "</span></div>";
+  let ps = document.getElementById("printsheet");
+  if (!ps) { ps = document.createElement("div"); ps.id = "printsheet"; document.body.appendChild(ps); }
+  ps.innerHTML = h;
+  const prevTitle = document.title;
+  document.title = name.replace(/\s+/g, "_") + "_" + SEASON_YEAR + "_Review";   // becomes the default PDF filename
+  const done = () => { document.title = prevTitle; window.removeEventListener("afterprint", done); };
+  window.addEventListener("afterprint", done);
+  const imgs = [...ps.querySelectorAll("img")].filter(i => !i.complete);
+  if (!imgs.length) window.print();
+  else { let n = imgs.length; imgs.forEach(i => { i.onload = i.onerror = () => { if (--n === 0) window.print(); }; }); }
 }
 
 /* ---------------- events browser ---------------- */
@@ -558,6 +648,7 @@ function render() {
     openKeys.has(k) ? openKeys.delete(k) : openKeys.add(k);
     render();
   }));
+  app.querySelectorAll("[data-export]").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); exportAthlete(b.getAttribute("data-export")); }));
   app.querySelectorAll("[data-ptoggle]").forEach(sm => sm.addEventListener("click", () => {
     const k = sm.getAttribute("data-ptoggle");
     openKeys.has(k) ? openKeys.delete(k) : openKeys.add(k);   // remember open/closed across re-renders
