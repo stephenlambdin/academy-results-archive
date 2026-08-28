@@ -528,7 +528,7 @@ function exportAthlete(rk) {
   const cur = rows.filter(x => dt(x) >= RANKINGS_RESET);
   const y26 = rows.filter(x => dt(x) < RANKINGS_RESET && dt(x).slice(0, 4) === SEASON_YEAR);
   const old = rows.filter(x => dt(x).slice(0, 4) < SEASON_YEAR);
-  const MAX = 30;                       // keeps the sheet to one page
+  const MAX = 24;                       // keeps the sheet to one page (letter, 0.5in margins)
   let budget = MAX;
   const table = list => {
     const shown = list.slice(0, Math.max(0, budget)); budget -= shown.length;
