@@ -149,7 +149,18 @@
     .quadline .export { margin-left:0; width:100%; text-align:center; padding:8px; }
     .cycle { flex-wrap:wrap; font-size:13px; padding:6px 12px; }
     .cycle .tally { margin-left:0; width:100%; justify-content:flex-start; }
-    .gcell { padding-left:6px; margin-left:2px; }
+    /* one row per grade on phones */
+    .quadline .tally, .cycle .tally, .prior summary .gsum { display:grid; grid-template-columns:1fr; gap:0; width:100%; }
+    .gcell { display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:5px 0; margin:0; border-left:none; border-bottom:1px solid var(--faint); }
+    .gcell b { flex:0 0 32px; }
+    .gcell:last-child { border-bottom:none; }
+    .gcell b { margin:0; font-size:16px; }
+    .gcell > span { justify-self:start; display:inline-block; }
+    .cycle .gcell { border-bottom-color:#333; }
+    .cycle .gcell b { color:var(--hi); }
+    .prior summary .gsum { margin-top:2px; }
+    .prior summary .gcell { padding:3px 0; }
+    .quadline .qlabel { margin-bottom:2px; }
     .rowbtn { padding:10px 12px; }
     .prior summary { flex-wrap:wrap; gap:4px; padding:8px 12px; }
     .prior summary .gsum { justify-content:flex-start; width:100%; }
