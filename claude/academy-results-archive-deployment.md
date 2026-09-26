@@ -1,6 +1,6 @@
 # Academy Results Archive — Deployment Record
 
-Deployed 2026-08-03 per BUILD_GUIDE.md. **Forty-four events live as of 2026-09-26** (the 2026 U.S. Season Final was added outside these sessions); **batches 12 and 13 (German Open, Multi European Games) are staged and bring it to 46 once pasted.** Forty-three events were live as of 2026-09-11 (batch 8: Taiyuan Women's Open day 1 + Muju Grand Prix; batch 9: Taiyuan days 2–3, completing that event; batch 10: Swiss Open; batch 11: Presidents Cup Oceania, Dutch Open, Australian Open). Events page has collapsible year grouping; podium/entry/match rows use uniform NOC + medal columns. The site nav now carries a third view, **ACADEMY ATHLETES**, added outside these import sessions.
+Deployed 2026-08-03 per BUILD_GUIDE.md. **Forty-six events live as of 2026-09-26** after batches 12 and 13 (German Open, Multi European Games) were pasted that day; the 2026 U.S. Season Final was added outside these sessions. Forty-three events were live as of 2026-09-11 (batch 8: Taiyuan Women's Open day 1 + Muju Grand Prix; batch 9: Taiyuan days 2–3, completing that event; batch 10: Swiss Open; batch 11: Presidents Cup Oceania, Dutch Open, Australian Open). Events page has collapsible year grouping; podium/entry/match rows use uniform NOC + medal columns. The site nav now carries a third view, **ACADEMY ATHLETES**, added outside these import sessions.
 
 ## Live system
 - **Site**: https://stephenlambdin.github.io/academy-results-archive/
@@ -20,8 +20,8 @@ Deployed 2026-08-03 per BUILD_GUIDE.md. **Forty-four events live as of 2026-09-2
 ## ⚠️ Score order differs by generator
 The 2026 sheets do **not** all print the score top-feeder-first. Muju prints the **winner's** rounds first; Taiyuan prints the **top feeder** first (and for the final, "top" means the **left** half of the bracket). `emit_division(out, score_order='winner'|'top')` — set it per event and verify. **After emitting, every score in the TSV must read winner-first (`2:0`, `2:1`, `1:0`); a single `0:2` means the flag is wrong.** Details and the counting check in `claude/import-2026-generator-notes.md`.
 
-## Current contents (as of 2026-09-11, after batch 11)
-Site header: **43 events · 6,110 athletes · 12,297 results**. Sheet: 43 Events, 12,302 Results rows, 11,007 Matches rows. (Site Results runs 5 below the sheet — long-standing same-name collapses, unchanged by batches 5–11.)
+## Current contents (as of 2026-09-26, after batches 12 and 13)
+Site header: **46 events · 6,422 athletes · 13,110 results**. Sheet: 46 Events, 13,115 Results rows, 11,775 Matches rows. (Site Results runs 5 below the sheet, the long-standing same-name collapses, unchanged by batches 5 to 13.)
 
 Batch 1 (8): 2023 Baku Worlds · 2025 Wuxi Worlds · 2026 Belgian Open · 2026 British Open · 2026 Pan Am Championship · 2026 Roma Grand Prix · 2026 US Nationals · 2026 Chuncheon Korea Open.
 
@@ -52,9 +52,9 @@ Files: `data/Batch11_ME3_{Events,Results,Matches}.tsv` (all three events in one 
 
 **Added between 2026-09-11 and 2026-09-26, outside these sessions:** 2026 U.S. Season Final (`us-season-final-2026`, National). Sheet stood at 44 Events, 12,357 Results, 11,049 Matches on 2026-09-26 before batches 12 and 13.
 
-Batch 12 (1, staged 2026-09-26, pending upload): **2026 German Open**, `german-open-2026`, 2026-09-20, Hamburg Germany, International G1. Senior day was Sunday 20 September (cadets and juniors ran the 19th). **16 divisions, 300 athletes, 284 matches.** Source: DTU drawsheets-results page, `GO-2026_Results_Draw-Sheet.pdf` pages 41 to 56 (Martial.Events / DXperience), parsed with **`variant='me2026'` unchanged**, score order top. All 64 medallists match `GO-2026_Medalists.pdf` exactly. Files: `data/Batch12_GermanOpen2026_{Events,Results,Matches}.tsv`.
+Batch 12 (1, pasted 2026-09-26): **2026 German Open**, `german-open-2026`, 2026-09-20, Hamburg Germany, International G1. Senior day was Sunday 20 September (cadets and juniors ran the 19th). **16 divisions, 300 athletes, 284 matches.** Source: DTU drawsheets-results page, `GO-2026_Results_Draw-Sheet.pdf` pages 41 to 56 (Martial.Events / DXperience), parsed with **`variant='me2026'` unchanged**, score order top. All 64 medallists match `GO-2026_Medalists.pdf` exactly. Files: `data/Batch12_GermanOpen2026_{Events,Results,Matches}.tsv`.
 
-Batch 13 (1, staged 2026-09-26, pending upload): **2026 Multi European Games**, `multi-european-games-2026`, 2026-09-13, Niš Serbia, International G1 (seniors G1, juniors and cadets E2). Senior day was Sunday 13 September. **16 divisions, 458 athletes, 442 matches.** Source: ETU documents page, `P11-Competition-Draw-Sheets.pdf` (WT results system, ActiveReports 19), parsed with the new **`variant='etu2026'`**, score order top. All 64 medallists match `P14-Medallists-by-Weight-Category.pdf` exactly. Files: `data/Batch13_MultiEuropeanGames2026_{Events,Results,Matches}.tsv`.
+Batch 13 (1, pasted 2026-09-26): **2026 Multi European Games**, `multi-european-games-2026`, 2026-09-13, Niš Serbia, International G1 (seniors G1, juniors and cadets E2). Senior day was Sunday 13 September. **16 divisions, 458 athletes, 442 matches.** Source: ETU documents page, `P11-Competition-Draw-Sheets.pdf` (WT results system, ActiveReports 19), parsed with the new **`variant='etu2026'`**, score order top. All 64 medallists match `P14-Medallists-by-Weight-Category.pdf` exactly. Files: `data/Batch13_MultiEuropeanGames2026_{Events,Results,Matches}.tsv`.
 
 All batch 12 and 13 divisions pass the full rule 4.04 suite with zero issues.
 
@@ -113,7 +113,7 @@ All batch 8, 9, 10 and 11 divisions pass the full rule 4.04 suite with zero issu
 - **The container can reach `docs.google.com` directly**, so all sheet *reads* (gviz CSV, `select count(A)`) can be done with curl from bash — no browser needed. Writes still need the browser.
 
 ## Open items
-- **Batches 12 and 13 are staged, not pasted.** Handoff: `HANDOFF_Batch12-13.md`.
+- **Batches 12 and 13 were pasted 2026-09-26** (handoff `HANDOFF_Batch12-13.md`). Verified: totals 46 / 13,115 / 11,775; per event 1/300/284 and 1/458/442; every pasted row matches its source TSV exactly; one US Season Final guard row at each anchor; start dates stored as real dates.
 - **Multi European Games calls for Stephen** (imported as printed until he decides):
   - 11 case-only clashes with the archive: `AYDOGAN Hamza Osman`, `BOUROGIANNI Konstantina Eleni`, `CEYLAN Ahmet Bogachan`, `DASGIN Elif Eylul`, `ELIA Luigi Antonio`, `KAVUKCUOGLU Zehra Begum`, `KESGIN Tuvanna Nazli`, `LAMPIS Filippo Maria`, `TURAN Sila Zeynep`, `YILMAZ Damla Nur`, `ZENOZI Kimia Alizadeh`. The archive holds each with a lowercase second given name.
   - Cross-batch: `YIGITALP Hatice Pinar` (MEG) against `YIGITALP Hatice pinar` (German Open).
