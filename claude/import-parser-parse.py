@@ -112,6 +112,10 @@ def parse_page(page, overrides=None, variant=None, spans_override=None):
     # 'etu2026' = me2026 geometry on WT ActiveReports sheets, with an entrant pre-pass
     # and three small tolerances (see import-2026-generator-notes.md).
     etu = (variant == 'etu2026')
+    # 'gpc2025' = wt2026 on the 2025 WT Grand Prix Challenge sheets (Chrome/Skia), where
+    # long entrant names wrap onto a second line that carries given names + NOC.
+    gpc = (variant == 'gpc2025')
+    if gpc: variant = 'wt2026'
     if etu:
         variant = 'me2026'
         if spans_override is None: spans_override = etu_spans(page)
@@ -154,7 +158,9 @@ def parse_page(page, overrides=None, variant=None, spans_override=None):
             if i in used: continue
             if not NOCTAIL.fullmatch(t) and not ENDSNOC.search(t) and len(t) > 3:
                 cand = [(j, bx, by, bt, bx1) for j, (bx, by, bt, bx1) in enumerate(spans)
-                        if j not in used and j != i and NOCTAIL.fullmatch(bt)
+                        if j not in used and j != i
+                        and (NOCTAIL.fullmatch(bt) or (gpc and re.match(r'^\((\d+|x)\)\s', t)
+                             and ENDSNOC.search(bt) and not bt.startswith('(')))
                         and 0 < by - y < 9 and (abs(bx - x) < 3 or abs(bx1 - x1) < 3)]
                 if cand:
                     j, bx, by, bt, bx1 = min(cand, key=lambda c: c[2])
@@ -478,6 +484,11 @@ def parse_page(page, overrides=None, variant=None, spans_override=None):
             fin.label = (cand[1], cand[2])
             if (cand[3], cand[4]) in meth_assign:
                 fin.method_raw = meth_assign[(cand[3], cand[4])]
+        if overrides and mt in overrides:
+            ov = overrides[mt]
+            fin.label = (ov[0], ov[1])
+            if len(ov) > 2: fin.method_raw = ov[2]
+            fin.flags.append('override-applied')
         if fin.label is None and podium:
             golds = [p for p in podium if p[0] == 1]
             if golds:
