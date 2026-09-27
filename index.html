@@ -191,37 +191,45 @@
     body > *:not(#printsheet) { display:none !important; }
     body { background:#fff; }
     #printsheet { display:block; color:#000; font-family:'Montserrat','Helvetica Neue',Arial,sans-serif; font-size:9.5pt; }
-    .ps-head { display:flex; align-items:center; gap:14px; border-bottom:3px solid #C3A141; padding-bottom:10px; }
-    .ps-head img.crest { width:60px; height:60px; }
-    .ps-head .eyebrow { color:#8A7430; font-size:8pt; font-weight:700; letter-spacing:0.28em; }
-    .ps-head h1 { font-family:'Bebas Neue',sans-serif; font-size:26pt; line-height:1; letter-spacing:0.04em; margin:2px 0 0; }
-    .ps-head .meta { font-size:8.5pt; color:#555; margin-top:2px; }
-    .ps-head img.pic { width:64px; height:64px; margin-left:auto; border:3px solid #C3A141; border-radius:50%; object-fit:cover; }
-    .ps-band { display:flex; align-items:center; gap:10px; margin-top:12px; padding:5px 10px; background:#000; color:#ECBE43; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.1em; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    .ps-band .sub { margin-left:auto; font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:600; letter-spacing:0.12em; color:#C3A141; text-transform:uppercase; }
-    .ps-page { page-break-before:always; break-before:page; }
-    table.ps tr.mark td { background:#F3EFE6; color:#8A7430; font-family:'Bebas Neue',sans-serif; font-size:10pt; letter-spacing:0.14em; padding:4px 6px; border-top:2px solid #C3A141; border-bottom:2px solid #C3A141; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    table.ps.gt { width:60%; margin-top:6px; }
-    table.ps.gt th { text-align:right; font-size:7.5pt; letter-spacing:0.14em; text-transform:uppercase; color:#8A7430; padding:3px 8px; border-bottom:2px solid #C3A141; }
-    table.ps.gt th:first-child { text-align:left; }
-    table.ps.gt td { text-align:right; padding:4px 8px; font-size:10pt; }
-    table.ps.gt td.gr { text-align:left; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.08em; }
-    table.ps.gt td.mg { color:#8A7430; font-weight:700; } table.ps.gt td.ms { font-weight:700; } table.ps.gt td.mb { color:#A0813A; font-weight:700; }
-    table.ps.gt td.tot { font-weight:700; }
-    table.ps.gt tr.sum td { border-top:2px solid #000; border-bottom:none; font-weight:700; }
-    .ps-band .gcell b { color:#fff; font-size:11pt; }
-    .ps-band .tally span:not(.gcell) { font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:700; letter-spacing:0.08em; padding:1px 6px; border-radius:3px; }
-    .ps-band .tg { background:#ECBE43; color:#000; } .ps-band .ts { background:#fff; color:#000; } .ps-band .tb { border:1px solid #C3A141; color:#C3A141; }
-    table.ps { width:100%; border-collapse:collapse; margin-top:4px; }
-    table.ps td { padding:3px 6px; border-bottom:1px solid #E5DFD2; vertical-align:top; }
-    table.ps td.d { width:78px; color:#555; white-space:nowrap; }
-    table.ps td.dv { width:120px; white-space:nowrap; }
-    table.ps td.lv { width:110px; color:#555; }
-    table.ps td.pl { width:66px; text-align:right; font-weight:700; letter-spacing:0.1em; font-size:8pt; }
-    table.ps td.pl.g { color:#8A7430; } table.ps td.pl.c { color:#999; font-weight:500; }
-    .ps-more { font-size:8pt; color:#777; padding:4px 6px; }
-    .ps-foot { margin-top:14px; border-top:1px solid #C3A141; padding-top:6px; font-size:7.5pt; color:#777; letter-spacing:0.1em; text-transform:uppercase; display:flex; justify-content:space-between; }
   }
+  /* phone PDF: the review sheet is laid out off screen and captured to a PDF (iPhone and iPad block window.print) */
+  #pdfstage { position:fixed; left:-10000px; top:0; width:720px; background:#fff; color:#000; font-family:'Montserrat','Helvetica Neue',Arial,sans-serif; font-size:9.5pt; }
+  #pdfstage .pdfpage { width:720px; background:#fff; padding:0 0 8px; }
+  #pdfstage .ps-page { page-break-before:auto; break-before:auto; }
+  .pdfmsg { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:50; background:#000; color:#fff; border:2px solid var(--hi); border-radius:8px; padding:12px 16px; font-size:14px; display:flex; gap:14px; align-items:center; box-shadow:0 6px 24px rgba(0,0,0,.35); max-width:92vw; }
+  .pdfmsg a { color:var(--black); background:var(--hi); padding:8px 14px; border-radius:6px; font-weight:700; text-decoration:none; white-space:nowrap; }
+  .pdfmsg button { background:none; border:none; color:#ccc; font-size:20px; cursor:pointer; }
+  /* review sheet styles (print and phone PDF) */
+  .ps-head { display:flex; align-items:center; gap:14px; border-bottom:3px solid #C3A141; padding-bottom:10px; }
+  .ps-head img.crest { width:60px; height:60px; }
+  .ps-head .eyebrow { color:#8A7430; font-size:8pt; font-weight:700; letter-spacing:0.28em; }
+  .ps-head h1 { font-family:'Bebas Neue',sans-serif; font-size:26pt; line-height:1; letter-spacing:0.04em; margin:2px 0 0; }
+  .ps-head .meta { font-size:8.5pt; color:#555; margin-top:2px; }
+  .ps-head img.pic { width:64px; height:64px; margin-left:auto; border:3px solid #C3A141; border-radius:50%; object-fit:cover; }
+  .ps-band { display:flex; align-items:center; gap:10px; margin-top:12px; padding:5px 10px; background:#000; color:#ECBE43; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.1em; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .ps-band .sub { margin-left:auto; font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:600; letter-spacing:0.12em; color:#C3A141; text-transform:uppercase; }
+  .ps-page { page-break-before:always; break-before:page; }
+  table.ps tr.mark td { background:#F3EFE6; color:#8A7430; font-family:'Bebas Neue',sans-serif; font-size:10pt; letter-spacing:0.14em; padding:4px 6px; border-top:2px solid #C3A141; border-bottom:2px solid #C3A141; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  table.ps.gt { width:60%; margin-top:6px; }
+  table.ps.gt th { text-align:right; font-size:7.5pt; letter-spacing:0.14em; text-transform:uppercase; color:#8A7430; padding:3px 8px; border-bottom:2px solid #C3A141; }
+  table.ps.gt th:first-child { text-align:left; }
+  table.ps.gt td { text-align:right; padding:4px 8px; font-size:10pt; }
+  table.ps.gt td.gr { text-align:left; font-family:'Bebas Neue',sans-serif; font-size:12pt; letter-spacing:0.08em; }
+  table.ps.gt td.mg { color:#8A7430; font-weight:700; } table.ps.gt td.ms { font-weight:700; } table.ps.gt td.mb { color:#A0813A; font-weight:700; }
+  table.ps.gt td.tot { font-weight:700; }
+  table.ps.gt tr.sum td { border-top:2px solid #000; border-bottom:none; font-weight:700; }
+  .ps-band .gcell b { color:#fff; font-size:11pt; }
+  .ps-band .tally span:not(.gcell) { font-family:'Montserrat',sans-serif; font-size:7.5pt; font-weight:700; letter-spacing:0.08em; padding:1px 6px; border-radius:3px; }
+  .ps-band .tg { background:#ECBE43; color:#000; } .ps-band .ts { background:#fff; color:#000; } .ps-band .tb { border:1px solid #C3A141; color:#C3A141; }
+  table.ps { width:100%; border-collapse:collapse; margin-top:4px; }
+  table.ps td { padding:3px 6px; border-bottom:1px solid #E5DFD2; vertical-align:top; }
+  table.ps td.d { width:78px; color:#555; white-space:nowrap; }
+  table.ps td.dv { width:120px; white-space:nowrap; }
+  table.ps td.lv { width:110px; color:#555; }
+  table.ps td.pl { width:66px; text-align:right; font-weight:700; letter-spacing:0.1em; font-size:8pt; }
+  table.ps td.pl.g { color:#8A7430; } table.ps td.pl.c { color:#999; font-weight:500; }
+  .ps-more { font-size:8pt; color:#777; padding:4px 6px; }
+  .ps-foot { margin-top:14px; border-top:1px solid #C3A141; padding-top:6px; font-size:7.5pt; color:#777; letter-spacing:0.1em; text-transform:uppercase; display:flex; justify-content:space-between; }
 </style>
 </head>
 <body>
@@ -334,6 +342,15 @@ async function loadTab(name) {
 }
 
 const S = v => String(v == null ? "" : v).trim();
+/* Divisions: U21 is shown as Senior, and each event lists Men lightest to heaviest, then Women (Stephen, 2026-09-27).
+   The sheet keeps its original labels; only the display and the order change. */
+const DV = d => S(d).replace(/^U21 /i, "Senior ");
+function divRank(d) {
+  const m = /(Women|Men)\s*([-+])\s*(\d+)/i.exec(S(d));
+  if (!m) return [9, 0];
+  return [/^women/i.test(m[1]) ? 1 : 0, Number(m[3]) + (m[2] === "+" ? 1000 : 0)];
+}
+function divCompare(a, b) { const x = divRank(a), y = divRank(b); return x[0] - y[0] || x[1] - y[1] || S(a).localeCompare(S(b)); }
 const KEY = (n, c) => S(n).toUpperCase() + "|" + S(c).toUpperCase();
 const ROUND_ORDER = { R256:0, R128:1, R64:2, R32:3, R16:4, QF:5, SF:6, BR:6.5, F:7 };
 const roundRank = r => ROUND_ORDER[S(r).toUpperCase()] ?? 99;
@@ -350,6 +367,7 @@ function flip(score) {
   const parts = S(score).split(":");
   return parts.length === 2 ? parts[1].trim() + ":" + parts[0].trim() : S(score);
 }
+const escA = s => String(s == null ? "" : s).replace(/[&<>"]/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[ch]));   // for input values: keeps spaces
 function esc(s) { return S(s).replace(/[&<>"]/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[ch])); }
 function chip(p) {
   p = Number(p);
@@ -414,6 +432,8 @@ let query = "";
 let openKeys = new Set();
 let closedYears = new Set();
 let yearsInitialized = false;
+let evQuery = "";
+let focusId = null;           // input to focus after the next full render (only on a tab switch)
 
 async function boot() {
   try {
@@ -463,15 +483,21 @@ function athleteMatches(name, noc, eventId, division) {
 }
 
 function renderSearch() {
-  let html = '<input type="search" id="q" placeholder="Search by athlete name or country code (PARK, or USA)" value="' + esc(query) + '">';
-  const q = query.trim().toUpperCase();
+  return '<input type="search" id="q" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Search by athlete name or country code (PARK, KIM Min, or USA)" value="' + escA(query) + '">' +
+         '<div id="sres">' + searchResults() + "</div>";
+}
+function searchResults() {
+  let html = "";
+  const q = query.trim().toUpperCase().replace(/\s+/g, " ");
+  const words = q.split(" ").filter(Boolean);
   if (q.length < 2) {
     html += '<p class="hint">Type at least two letters of a name. Every competitor in the archive is searchable, medalists and non-medalists alike. Open an event under an athlete to see their full match log.</p>';
   } else {
     const map = new Map();
     DB.results.forEach(r => {
       const n = S(r["Athlete"]), c = S(r["NOC"]);
-      if (n.toUpperCase().includes(q) || c.toUpperCase() === q) {
+      const N = n.toUpperCase();
+      if ((words.length > 1 ? words.every(w => N.includes(w)) : N.includes(q)) || c.toUpperCase() === q) {
         const k = KEY(n, c);
         if (!map.has(k)) map.set(k, { name: n, noc: c, rows: [] });
         map.get(k).rows.push(r);
@@ -492,7 +518,7 @@ function renderSearch() {
         const open = openKeys.has(k);
         html += '<div class="divline"><button class="rowbtn" data-toggle="' + esc(k) + '">' +
                 '<span><span class="ev-name">' + esc(ev["Event Name"] || evId) + '</span><br>' +
-                '<span class="ev-meta">' + esc(fmtDate(ev["Start Date"])) + " · " + esc(div) + (ev["Level"] ? " · " + esc(ev["Level"]) : "") + "</span></span>" +
+                '<span class="ev-meta">' + esc(fmtDate(ev["Start Date"])) + " · " + esc(DV(div)) + (ev["Level"] ? " · " + esc(ev["Level"]) : "") + "</span></span>" +
                 chip(r["Placement"]) + "</button>";
         if (open) {
           const log = athleteMatches(a.name, a.noc, evId, div);
@@ -533,7 +559,7 @@ function resultRow(r, keyPrefix) {
   const open = openKeys.has(k);
   let html = '<div class="divline"><button class="rowbtn" data-toggle="' + esc(k) + '">' +
     '<span><span class="ev-name">' + esc(ev["Event Name"] || evId) + '</span><br>' +
-    '<span class="ev-meta">' + esc(fmtDate(ev["Start Date"])) + " · " + esc(div) + (ev["Level"] ? " · " + esc(ev["Level"]) : "") + "</span></span>" +
+    '<span class="ev-meta">' + esc(fmtDate(ev["Start Date"])) + " · " + esc(DV(div)) + (ev["Level"] ? " · " + esc(ev["Level"]) : "") + "</span></span>" +
     chip(r["Placement"]) + "</button>";
   if (open) {
     const log = athleteMatches(S(r["Athlete"]), S(r["NOC"]), evId, div);
@@ -627,7 +653,7 @@ function exportAthlete(rk) {
   const tr = x => {
     const ev = DB.evById[S(x["EventID"])] || {}; const p = Number(x["Placement"]);
     const lab = p === 1 ? "GOLD" : p === 2 ? "SILVER" : p === 3 ? "BRONZE" : "Competed";
-    return '<tr><td class="d">' + esc(fmtDate(ev["Start Date"])) + '</td><td>' + esc(ev["Event Name"] || "") + '</td><td class="dv">' + esc(x["Division"]) + '</td><td class="lv">' + esc(ev["Level"] || "") + '</td><td class="pl ' + (p >= 1 && p <= 3 ? "g" : "c") + '">' + lab + "</td></tr>";
+    return '<tr><td class="d">' + esc(fmtDate(ev["Start Date"])) + '</td><td>' + esc(ev["Event Name"] || "") + '</td><td class="dv">' + esc(DV(x["Division"])) + '</td><td class="lv">' + esc(ev["Level"] || "") + '</td><td class="pl ' + (p >= 1 && p <= 3 ? "g" : "c") + '">' + lab + "</td></tr>";
   };
   const marker = '<tr class="mark"><td colspan="5">Rankings reset · ' + esc(RESET_LABEL) + "</td></tr>";
   let h = '<div class="ps-head">' + crestImg() +
@@ -679,17 +705,73 @@ function exportAthlete(rk) {
   document.title = name.replace(/\s+/g, "_") + "_" + SEASON_YEAR + "_Review";   // default PDF filename
   const done = () => { document.title = prevTitle; window.removeEventListener("afterprint", done); };
   window.addEventListener("afterprint", done);
+  if (isTouchDevice()) { phonePdf(h, document.title + ".pdf"); document.title = prevTitle; window.removeEventListener("afterprint", done); return; }
   const imgs = [...ps.querySelectorAll("img")].filter(i => !i.complete);
   if (!imgs.length) window.print();
   else { let n = imgs.length; imgs.forEach(i => { i.onload = i.onerror = () => { if (--n === 0) window.print(); }; }); }
+}
+/* iPhone and iPad (and Android) do not print reliably from a web page, so the same review sheet is drawn off screen,
+   captured with html2canvas and saved as a two-page PDF with jsPDF; a button then opens or saves the file. */
+function isTouchDevice() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+function loadScript(src) {
+  return new Promise((ok, bad) => {
+    if (document.querySelector('script[src="' + src + '"]')) return ok();
+    const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = () => bad(new Error("could not load " + src));
+    document.head.appendChild(t);
+  });
+}
+function pdfMessage(html) {
+  let m = document.getElementById("pdfmsg");
+  if (!m) { m = document.createElement("div"); m.id = "pdfmsg"; m.className = "pdfmsg"; document.body.appendChild(m); }
+  m.innerHTML = html + '<button aria-label="Close" onclick="this.parentNode.remove()">×</button>';
+}
+async function phonePdf(h, filename) {
+  pdfMessage("<span>Making the PDF…</span>");
+  try {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    let st = document.getElementById("pdfstage");
+    if (!st) { st = document.createElement("div"); st.id = "pdfstage"; document.body.appendChild(st); }
+    const cut = h.indexOf('<div class="ps-page">');
+    const pages = cut > 0 ? [h.slice(0, cut), h.slice(cut)] : [h];
+    st.innerHTML = pages.map(p => '<div class="pdfpage">' + p + "</div>").join("");
+    const imgs = [...st.querySelectorAll("img")];
+    await Promise.all(imgs.map(i => i.complete ? null : new Promise(r => { i.onload = i.onerror = r; })));
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const pdf = new window.jspdf.jsPDF({ unit: "pt", format: "letter" });
+    const W = 612, H = 792, M = 36, maxW = W - 2 * M, maxH = H - 2 * M;
+    const els = [...st.querySelectorAll(".pdfpage")];
+    for (let n = 0; n < els.length; n++) {
+      const c = await window.html2canvas(els[n], { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });
+      let w = maxW, hh = c.height * maxW / c.width;
+      if (hh > maxH) { w = w * maxH / hh; hh = maxH; }
+      if (n) pdf.addPage();
+      pdf.addImage(c.toDataURL("image/jpeg", 0.92), "JPEG", M, M, w, hh);
+    }
+    st.remove();
+    const url = URL.createObjectURL(pdf.output("blob"));
+    pdfMessage('<span>PDF ready</span><a href="' + url + '" download="' + escA(filename) + '" target="_blank" rel="noopener">Open PDF</a>');
+  } catch (e) {
+    pdfMessage("<span>Could not make the PDF (" + esc(e.message) + "). Check the connection and try again.</span>");
+  }
 }
 function crestImg() { const c = document.querySelector("header img"); return c ? '<img class="crest" src="' + c.src + '" alt="">' : ""; }
 function today() { return new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }); }
 
 /* ---------------- events browser ---------------- */
 function renderEvents() {
-  let html = '<div class="toolbar"><a href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '" target="_blank" rel="noopener">Open the source sheet</a></div>';
-  const evs = [...DB.events].sort((a, b) => S(b["Start Date"]).localeCompare(S(a["Start Date"])));
+  return '<input type="search" id="eq" autocomplete="off" spellcheck="false" placeholder="Search events by name, city, country, year or level (Dutch Open, 2025, G2)" value="' + escA(evQuery) + '">' +
+         '<div class="toolbar"><a href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '" target="_blank" rel="noopener">Open the source sheet</a></div>' +
+         '<div id="eres">' + eventsList() + "</div>";
+}
+function eventsList() {
+  let html = "";
+  const words = evQuery.trim().toUpperCase().split(/\s+/).filter(Boolean);
+  const hay = ev => [ev["Event Name"], ev["Location"], ev["Level"], ev["Start Date"], ev["EventID"]].map(S).join(" ").toUpperCase();
+  const evs = [...DB.events].filter(ev => words.every(w => hay(ev).includes(w))).sort((a, b) => S(b["Start Date"]).localeCompare(S(a["Start Date"])));
+  if (words.length) html += '<p class="hint">' + evs.length + " event" + (evs.length !== 1 ? "s" : "") + ' match "' + esc(evQuery) + '".</p>';
   const byYear = new Map();
   evs.forEach(ev => {
     const y = S(ev["Start Date"]).slice(0, 4) || "Undated";
@@ -703,7 +785,7 @@ function renderEvents() {
   }
   years.forEach(year => {
     const group = byYear.get(year);
-    const closed = closedYears.has(year);
+    const closed = !words.length && closedYears.has(year);   // a search opens every year
     html += '<button class="yearbar" data-ytoggle="' + esc(year) + '"><span class="yeartxt">' + esc(year) + '</span>' +
             '<span class="count">' + group.length + " event" + (group.length !== 1 ? "s" : "") + '</span>' +
             '<span class="tog">' + (closed ? "+" : "–") + "</span></button>";
@@ -712,7 +794,7 @@ function renderEvents() {
   });
   function renderEventCard(ev) {
     const evId = S(ev["EventID"]);
-    const divs = [...new Set(DB.results.filter(r => S(r["EventID"]) === evId).map(r => S(r["Division"])))];
+    const divs = [...new Set(DB.results.filter(r => S(r["EventID"]) === evId).map(r => S(r["Division"])))].sort(divCompare);
     const k = "ev@" + evId;
     const open = openKeys.has(k);
     html += '<div class="card"><button class="rowbtn" data-toggle="' + esc(k) + '">' +
@@ -727,7 +809,7 @@ function renderEvents() {
         const dk = "dv@" + evId + "@" + div;
         const dopen = openKeys.has(dk);
         html += '<div class="divcard"><button class="rowbtn" data-toggle="' + esc(dk) + '">' +
-                '<span class="divhead">' + esc(div.toUpperCase()) + '</span><span class="count">' + rows.length + " competitors</span></button>";
+                '<span class="divhead">' + esc(DV(div).toUpperCase()) + '</span><span class="count">' + rows.length + " competitors</span></button>";
         if (dopen) {
           const mts = DB.matches.filter(m => S(m["EventID"]) === evId && S(m["Division"]) === div)
             .sort((a, b) => roundRank(a["Round"]) - roundRank(b["Round"]));
@@ -761,11 +843,16 @@ function render() {
   const app = document.getElementById("app");
   app.innerHTML = tab === "search" ? renderSearch() : tab === "academy" ? renderAcademy() : renderEvents();
   const q = document.getElementById("q");
-  if (q) {
-    q.addEventListener("input", e => { query = e.target.value; render(); });
-    q.focus();
-    q.setSelectionRange(q.value.length, q.value.length);
+  if (q) q.addEventListener("input", e => { query = e.target.value; const r = document.getElementById("sres"); r.innerHTML = searchResults(); bind(r); });
+  const eq = document.getElementById("eq");
+  if (eq) eq.addEventListener("input", e => { evQuery = e.target.value; const r = document.getElementById("eres"); r.innerHTML = eventsList(); bind(r); });
+  if (focusId && document.getElementById(focusId) && !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    const f = document.getElementById(focusId); f.focus(); f.setSelectionRange(f.value.length, f.value.length);
   }
+  focusId = null;
+  bind(app);
+}
+function bind(app) {
   app.querySelectorAll("[data-toggle]").forEach(btn => btn.addEventListener("click", () => {
     const k = btn.getAttribute("data-toggle");
     openKeys.has(k) ? openKeys.delete(k) : openKeys.add(k);
@@ -782,7 +869,7 @@ function render() {
     render();
   }));
 }
-document.getElementById("tab-search").addEventListener("click", () => { tab = "search"; render(); });
+document.getElementById("tab-search").addEventListener("click", () => { tab = "search"; focusId = "q"; render(); });
 document.getElementById("tab-academy").addEventListener("click", () => { tab = "academy"; render(); });
 document.getElementById("tab-events").addEventListener("click", () => { tab = "events"; render(); });
 boot();
