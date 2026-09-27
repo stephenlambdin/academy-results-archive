@@ -1,6 +1,6 @@
 # Academy Results Archive — Deployment Record
 
-Deployed 2026-08-03 per BUILD_GUIDE.md. **Fifty-one events live as of 2026-09-26** after batch 14 (2025 Dutch Open, Belgian Open, Muju GPC, Presidents Cup Pan Am, Bangkok GPC) was pasted that day, following batches 12 and 13 (German Open, Multi European Games) earlier the same day; the 2026 U.S. Season Final was added outside these sessions. Forty-three events were live as of 2026-09-11 (batch 8: Taiyuan Women's Open day 1 + Muju Grand Prix; batch 9: Taiyuan days 2–3, completing that event; batch 10: Swiss Open; batch 11: Presidents Cup Oceania, Dutch Open, Australian Open). Events page has collapsible year grouping; podium/entry/match rows use uniform NOC + medal columns. The site nav now carries a third view, **ACADEMY ATHLETES**, added outside these import sessions.
+Deployed 2026-08-03 per BUILD_GUIDE.md. **One hundred events live as of 2026-09-27** after batch 16 (28 WT-ranked events from 2024 to 2026 plus the matches for the 2026 Asian Open) was pasted that morning. Seventy-two were live on 2026-09-26 after batch 15 (21 events from the 2025 and 2026 WT ranking calendar) was pasted that evening. Fifty-one were live earlier that day after batch 14 (2025 Dutch Open, Belgian Open, Muju GPC, Presidents Cup Pan Am, Bangkok GPC) was pasted that day, following batches 12 and 13 (German Open, Multi European Games) earlier the same day; the 2026 U.S. Season Final was added outside these sessions. Forty-three events were live as of 2026-09-11 (batch 8: Taiyuan Women's Open day 1 + Muju Grand Prix; batch 9: Taiyuan days 2–3, completing that event; batch 10: Swiss Open; batch 11: Presidents Cup Oceania, Dutch Open, Australian Open). Events page has collapsible year grouping; podium/entry/match rows use uniform NOC + medal columns. The site nav now carries a third view, **ACADEMY ATHLETES**, added outside these import sessions.
 
 ## Live system
 - **Site**: https://stephenlambdin.github.io/academy-results-archive/
@@ -21,8 +21,12 @@ Deployed 2026-08-03 per BUILD_GUIDE.md. **Fifty-one events live as of 2026-09-26
 ## ⚠️ Score order differs by generator
 The 2026 sheets do **not** all print the score top-feeder-first. Muju prints the **winner's** rounds first; Taiyuan prints the **top feeder** first (and for the final, "top" means the **left** half of the bracket). `emit_division(out, score_order='winner'|'top')` — set it per event and verify. **After emitting, every score in the TSV must read winner-first (`2:0`, `2:1`, `1:0`); a single `0:2` means the flag is wrong.** Details and the counting check in `claude/import-2026-generator-notes.md`.
 
-## Current contents (as of 2026-09-26, after batch 14)
-Site header: **51 events · 6,722 athletes · 14,894 results**. Sheet: 51 Events, 14,899 Results rows, 13,511 Matches rows. (Site Results runs 5 below the sheet, the long-standing same-name collapses, unchanged by batches 5 to 14.)
+## Current contents (as of 2026-09-27, after batch 16)
+Site header: **100 events · 8,818 athletes · 29,360 results**. Sheet: 100 Events, 29,365 Results rows, 27,372 Matches rows. (Site Results still 5 below the sheet; batch 16 added none.)
+
+After batch 15 the figures were: site header **72 events · 7,376 athletes · 21,880 results** (7,809 right after the batch 15 paste, 7,801 after the Academy name merge, 7,376 after the GAL-verified merge of everyone else). Sheet: 72 Events, 21,885 Results rows, 20,129 Matches rows. (Site Results still runs 5 below the sheet, the long-standing same-name collapses; batch 15 added none.)
+
+After batch 14 the figures were: site 51 events · 6,722 athletes · 14,894 results; sheet 51 / 14,899 / 13,511.
 
 Batch 1 (8): 2023 Baku Worlds · 2025 Wuxi Worlds · 2026 Belgian Open · 2026 British Open · 2026 Pan Am Championship · 2026 Roma Grand Prix · 2026 US Nationals · 2026 Chuncheon Korea Open.
 
@@ -68,7 +72,64 @@ Batch 14 (5, pasted 2026-09-26). Stephen asked for these by name; all five pass 
 
 Files: `data/Batch14_{DutchOpen2025,BelgianOpen2025,MujuGPC2025,PresidentsCupPanAm2025,BangkokGPC2025}_{Events,Results,Matches}.tsv`; paste blocks in `paste/Paste_*_Batch14.tsv`. WT SimplyCompete had no draws for these events (as Stephen expected); the WT results site (`downloadZip`, boards per division) and taekwondo.tv were the sources.
 
+Batch 15 (21, pasted 2026-09-26). Built and validated in an earlier session; loaded from `BATCH15_HANDOFF.md`. Per event (Events/Results/Matches):
+- **2025 British Open**, `british-open-2025`, 2025-03-22, Manchester, International G1: 1/231/215
+- **2025 European Club Championships**, `european-club-championships-2025`, 2025-04-14, Tallinn, Club Championships: 1/287/271
+- **2025 Tallinn Open**, `tallinn-open-2025`, 2025-04-15, International G1: 1/235/219
+- **2025 Presidents Cup Europe**, `presidents-cup-europe-2025`, 2025-05-18, Sofia: 1/540/524
+- **2025 Luxembourg Open**, `luxembourg-open-2025`, 2025-06-07, International G1: 1/235/219
+- **2025 Chuncheon Korea Open**, `chuncheon-korea-open-2025`, 2025-07-15, International G2: 1/361/345
+- **2025 Rhine-Ruhr FISU World University Games**, `fisu-world-university-games-2025`, 2025-07-19, Essen, University Games: 1/425/409
+- **2025 Presidents Cup Oceania**, `presidents-cup-oceania-2025`, 2025-08-14, Gold Coast: 1/219/203
+- **2025 Australian Open**, `australian-open-2025`, 2025-08-16, Gold Coast, International G2: 1/214/198
+- **2025 German Open**, `german-open-2025`, 2025-09-14, Hamburg, International G2: 1/385/369
+- **2025 Wuxi Grand Slam Challenge**, `wuxi-grand-slam-challenge-2025`, 2025-11-02, Grand Slam Challenge: 1/329/329
+- **2026 Fujairah Open**, `fujairah-open-2026`, 2026-02-01, International G2: 1/64/0 (podium only, no matches)
+- **2026 Austrian Open**, `austrian-open-2026`, 2026-02-07, Innsbruck, International G1: 1/423/407
+- **2026 Bulgaria Open**, `bulgaria-open-2026`, 2026-02-27, Sofia, International G2: 1/554/538
+- **2026 Turkiye Open**, `turkiye-open-2026`, 2026-03-30, Antalya, International G1: 1/475/459
+- **2026 European Taekwondo Championships**, `european-championships-2026`, 2026-05-11, Munich, International G4: 1/363/347
+- **2026 Asian Taekwondo Championships**, `asian-championships-2026`, 2026-05-21, Ulaanbaatar, International G4: 1/318/302
+- **2026 Luxembourg Open**, `luxembourg-open-2026`, 2026-05-24, International G1: 1/209/193
+- **2026 Presidents Cup Europe**, `presidents-cup-europe-2026`, 2026-06-04, Nuremberg: 1/459/443
+- **2026 European Club Championships**, `european-club-championships-2026`, 2026-06-20, Club Championships (location blank): 1/408/392
+- **2026 Bosnia Open**, `bosnia-open-2026`, 2026-06-21, Sarajevo, International G1: 1/252/236
+
+Source: results.worldtaekwondo.org for structure; printed PDF names and NOCs where available; WT profile names for FISU, Austria, both Luxembourg Opens, PC Oceania, Australian and Bosnia. **Excluded:** Balkan Cup 2026 (WT data inconsistent, no PDF).
+
+Fixes: Asian Championships winners repaired from bracket progression and medallists (contests 116, 216, 310, 311). Austrian Open Men +87kg SF ABBASIPOUYA def. GEORGIEVSKI (PTF 2:0) added from the PDF (missing on WT; Match No blank). Wuxi per-division winner overrides; W-57 223/423 and W-67 222/422 set PTF 2:0. German Open 2025 M-80 F 933 WDR, blank score.
+
+Names: case-only clashes checked against WT member (GAL) numbers. 146 Batch 15 spellings changed to the archive's form (258 Results cells, 538 Matches cells). TRAN Nguyen anh ngan (VIE-3059) kept apart from archive TRAN NGUYEN Anh ngan (VIE-2281). 8 names with no GAL left as printed. About 100 older case-only variants inside the archive are untouched. Detail in `claude/import-batch15-notes.md`.
+
+Files: `data/Batch15_{Events,Results,Matches}.tsv`, `paste/Paste_*_Batch15.tsv` (guard line = Bangkok 2025 last row). Reference files `Batch15_name_consolidation.csv` and `wt_member_index.csv` stay on Stephen's Mac, not in the repo.
+
+Batch 16 (28 new events + Asian Open 2026 completion, pasted 2026-09-27). Built from the Opponent Quality "Events to find" list (sections 1 to 4); loaded from `BATCH16_HANDOFF.md`. 7,480 Results rows and 7,243 Matches rows; every division passes rule 4.04; podiums checked against the printed classifications and WT medallist pages. Per event (Results/Matches):
+- **WT results system (names as on WT profiles):** 2025 Fujairah Open 460/444 · 2025 Turkish Open 478/462 · 2025 Slovenia Open 264/248 · 2025 Skopje Open Ramus 207/191 · 2025 Bulgaria Open 327/311 · 2025 Galeb Belgrade Trophy Serbia Open 345/329 · 2025 Greece Open 241/225 · 2025 Austrian Open 252/236 · 2025 Polish Open 258/242 · 2025 Malabo Women's Open 123/115 · 2025 Croatia Open 159/143 · 2026 Slovenia Open 397/381 · 2026 Skopje Open Ramus 312/296 · 2026 Spanish Open 430/414 · 2026 Kimunyong Cup 192/176.
+- **2026 Asian Taekwondo Indonesia Open** (`asian-open-2026`, existing event, no new Events row): adds results for the 4 missing divisions (111 rows) and all 296 matches; matches in the 12 existing divisions use the archive's existing names.
+- **2024 events from printed draw sheets:** Luxembourg Open 246/230 and Polish Open 239/223 (tpss.eu, TaekoPlan) · European Club Championships 259/243, Riga Open 165/149, Albania Open 235/219 (tpss.eu) · Solidarity Center Open 165/149, Havana Open 117/102, Dracula Open 302/286, Bosnia Open 300/284, Balkan Cup 124/109 (admin.uptkd.com) · Chuncheon Korea Open 281/265 (organiser draws) · Presidents Cup Oceania 178/162 (Martial.Events) · Wuxi Grand Slam Challenge 313/313 (WT result draws via MASTKD).
+
+Fixes and names: the four 2024 sheets that print "Mar" as "Max" had 13 spellings corrected where the WT index confirms the athlete; names clipped on the sheet were completed from the archive or WT index (`Batch16_name_changes.csv`); mixed-case sheets had surname case restored where evidence exists (55 left as printed). Case-only clashes: 175 groups checked by GAL, 146 same-GAL spellings aligned to the archive form, 19 with no GAL left as printed (`Batch16_name_consolidation.csv`). Per-match fixes (label swaps, loser-first scores, hand-read methods) are listed in `claude/import-batch16-notes.md`.
+
+Not imported: 2024 Dutch Open (medals only), 2024 Australian Open, 2024 Kimunyong Cup and 2024 CISM (no sources), 2024 Croatia Open (clubs printed instead of NOCs, needs a decision), 2026 Fujairah full brackets and 2026 Presidents Cup Asia (nothing on the WT results system).
+
+Files: `data/Batch16_{Events,Results,Matches}.tsv`, `paste/Paste_*_Batch16.tsv` (guard line = Bosnia Open 2026 last row). Hashes checked on raw.githubusercontent.com before pasting.
+
 All batch 8, 9, 10 and 11 divisions pass the full rule 4.04 suite with zero issues, and all 8 Taiyuan podiums match the Medalist PDFs exactly. Parser support is `variant='wt2026'` in `claude/import-parser-parse.py`; the Type3 decoder is `claude/import-decoder-type3.py`; the format work is written up in **`claude/import-2026-generator-notes.md`** — read that before touching a 2026 sheet.
+
+## Name cleanup (2026-09-26, after batch 15)
+Stephen asked for (1) the older case-only name variants to be cleaned up and (2) every Academy athlete to show under one name, domestic and international results in one search card, using WT member numbers (GAL).
+
+**Case-only cleanup.** 148 groups of the same name and NOC in different capitalisation. 137 unified (678 cells: 229 Results, 449 Matches) to the archive's most-used form, with three rules on top: an all-caps form loses to the `SURNAME Given` form (`Alexander NIEVES`, `Bryan DAVIS`, `ZUO Ju`); `NICKOLAS CJ` stays (decision 5); ties go to the archive's majority style (later given names lower case). 11 held: the 8 Batch 15 no-GAL names (open question), TRAN NGUYEN Anh ngan (VIE-2281 vs VIE-3059), `DE Pedro Henrique` and `LEE Jun seo` (crosswalk ambiguous). Two cells whose values start with `-` (`- Sanchit`, `- Naveen`) were deliberately never pasted over. Note: the site already groups names case-insensitively (`KEY` = upper(name)|NOC), so this was display consistency only.
+
+**Academy athletes, one name each.** Domestic Martial.Events sheets print first-name-first, and some WT sheets clip names, so several Academy athletes had 2 or 3 search cards. Every form was tied to the roster member number and set to the international `SURNAME Given` form (79 cells): `KHALFANI HARRIS` > `HARRIS Khalfani`; `MAIKOL RODRIGUEZ` > `RODRIGUEZ Maikol`; `ISAIAH YOUNG` > `YOUNG Isaiah`; `MONTANA MILLER` > `MILLER Montana`; `MAKAYLA GREENWOOD` > `GREENWOOD Makayla`; `JESSICA GNIEDZIEJKO` and `GNIEDZIEJKO Jessic` > `GNIEDZIEJKO Jessica`; `YOUNG SUK GUN` (2024 Nationals, 2025 U21 Trials, M-54) > `GUN Youngsuk Ethan`. The Academy tab now finds 26 results for Ethan Gun (was 24) and 16 for Jessica Gniedziejko. This supersedes "names as printed" for the domestic rows of Academy athletes.
+
+Verified: every cell in all three tabs equals the expected post-change table (0 unintended differences). Site header after these two steps: 72 events · 7,801 athletes · 21,880 results.
+
+Files on Stephen's Mac, `Academy Opponent Quality/archive_import_sources/name_cleanup/`: `backup_before_cleanup_*.csv`, `backup_before_everyone_merge_*.csv` (full sheet snapshots), `name_cleanup_changes.csv` / `name_cleanup_groups.csv`, `academy_name_changes.csv`, and the proposal for everyone else, `everyone_name_groups.csv` / `everyone_name_changes.csv`.
+
+**Everyone else, GAL-verified only (Stephen: "only the ones that you can verify their WT GAL number, then we will reassess").** 410 athletes merged, 3,666 cells. A group was merged only when every spelling resolves to the same single WT member number, through `crosswalk.csv` (by archive name or by token key), `identity_decisions.csv`, or an exact-name hit in `wt_member_index.csv`. The name shown is the international WT form (full surnames, `SURNAME Given`). 117 of the 410 are US athletes whose domestic (first-name-first) and international rows now share one card; the rest are clipped names, missing second surnames, accents and punctuation (for example `MORAN Belen` > `MORAN ROMERO Belen`, `Gunnar SUMNER` > `SUMNER Gunnar`, `GONZÁLEZ María` > `GONZALEZ Maria`, `. Vaishnave` > `Vaishnave`). **Not merged:** 87 groups with no WT member (mostly domestic-only US athletes such as `RYELAND LOLLY` / `LOLLY Ryeland`), 47 crosswalk pairs whose spellings do not line up, 2 shared-name groups (TRAN, LEE Jun seo), and the 9 open Batch 15 names. RUS/AIN and BLR/AIN splits are untouched (they need a NOC change, not a name change). Verified: every cell in all three tabs equals the expected table, Roster tab unchanged. Site header after: **72 events · 7,376 athletes · 21,880 results**. Files: `gal_merge_groups.csv` (merged and not-merged lists with GAL), `gal_merge_changes.csv` (every cell, old and new).
+
+**Edit route used (no Chrome):** the Claude desktop app's built-in browser, signed in to Google, with Name Box navigation plus synthetic `ClipboardEvent('paste')` per contiguous run of changed cells (about 0.75 s per paste). The name map was loaded into the page and the page read the sheet's own gviz CSV (same origin) to build the pastes. **Keep the Claude app in the foreground while this runs**: when the window is hidden, timers throttle and some pastes silently fail (305 cells had to be re-run on 2026-09-26). Waits built on `MessageChannel` instead of `setTimeout` help but do not fully fix it; always re-diff the whole sheet afterwards. Reads and verification via gviz from the container.
 
 ## Judgment decisions (Stephen approved)
 1. **U21 M-63 match 210** (batch 2): recorded TLEULES def. YASER, method/score blank.
@@ -95,7 +156,7 @@ All batch 8, 9, 10 and 11 divisions pass the full rule 4.04 suite with zero issu
 
 ## Checked and deliberately not imported
 - **2026 Nations Cup** (G1, Quito Ecuador, 12 to 13 September). **Stephen's call, 2026-09-26: hold until the Ecuadorian federation posts official draw sheets.** The only source found is taekwondo.tv, which reverses names (`Jared Esteban Vargas VERA`), capitalises only the last word, and carries no methods. The senior field is small: 14 divisions, 50 athletes, 36 matches.
-- **13th Fujairah Open 2026** (G-2, Feb 2026, Fujairah UAE). No senior results exist in any public source — the organiser never uploaded to the WT results system. **Stephen's call, 2026-08-16: skip entirely — no Events row.**
+- **13th Fujairah Open 2026**: *superseded by batch 15, which loads the 64 podium rows from the WT results system (no matches).* Original note: (G-2, Feb 2026, Fujairah UAE). No senior results exist in any public source — the organiser never uploaded to the WT results system. **Stephen's call, 2026-08-16: skip entirely — no Events row.**
 - **2025 Fujairah Open** (12th, G-2, 9–13 Feb 2025). Fully parsed and verified on 2026-08-16 — 16 divisions, 460 athletes, 444 matches, zero issues, both medal tables in the source reconciled exactly. TSVs are committed at `data/Batch7_Fujairah2025_*.tsv` but the sheet paste was blocked at the time (see the browser note below). **Stephen's call, 2026-09-11: skip.** If it is ever wanted, the files are ready and only need the three pastes.
 
 ## Import tooling (project docs, reusable)
@@ -122,9 +183,15 @@ All batch 8, 9, 10 and 11 divisions pass the full rule 4.04 suite with zero issu
 - Type the commit summary with **real keystrokes** after confirming `#commit-summary-input` is `document.activeElement`; setting `.value` from JS trips GitHub's guard.
 - After committing, `api.github.com/.../contents/data` can lag by a minute — `raw.githubusercontent.com` updates first, so confirm there.
 - Verify each paste with gviz counts *and* a guard-row-duplication check before moving to the next tab.
+- **Batch 15 route (2026-09-26)**: Claude in Chrome would not connect, so Stephen dragged the six TSVs into the two GitHub upload pages himself, and the sheet paste ran in the Claude desktop app's **built-in browser** (signed in to Google): Name Box via JS (focus `#t-name-box`, set value, Enter key events), then a synthetic `ClipboardEvent('paste')` carrying the raw.githubusercontent text on the `cell-input` element. Worked first time on all three tabs, no foreground or clipboard issues. Hashes were checked on raw.githubusercontent.com before pasting.
+- **Batch 16 route (2026-09-27)**: Claude in Chrome connected. Chrome must be **signed in to GitHub** (signed out, the upload page says "Uploads are disabled"). `file_upload` only accepts paths the session can read: stage the files from the connected Mac folder first (`device_stage_files` puts them under `/mnt/user-data/uploads/Academy Opponent Quality/...`) and pass those staged paths; `/mnt/user-data/outputs/...` and Mac paths were rejected. Sheet paste in the same Chrome tab with the Name Box + synthetic paste method; all three tabs worked first time. Verification by exporting each tab as TSV (`/export?format=tsv&gid=...`) from the container.
 - **The container can reach `docs.google.com` directly**, so all sheet *reads* (gviz CSV, `select count(A)`) can be done with curl from bash — no browser needed. Writes still need the browser.
 
 ## Open items
+- **Batch 16 pasted 2026-09-27.** Verified: totals 100 / 29,365 / 27,372; all 28 + 7,480 + 7,243 pasted rows equal `Batch16_*.tsv` exactly (sheet TSV export compare); the three Bosnia 2026 guard rows unchanged; no duplicate EventIDs (asian-open-2026 appears once); Start Dates are date cells; Scores are text; site header 100 events · 8,818 athletes · 29,360 results.
+- **Batch 16 calls for Stephen**: LEE Jun seo at Kimunyong 2026 is KOR-12285, not the archive's KOR-9573 (same printed name, so the site merges them); Chuncheon 2024 M-58 #308 "BYE 0:0" kept as a match with blank method (drop it?); 2024 Croatia Open import with club-based NOCs (Academy athletes Isaiah Young, Khalfani Harris and Montana Miller competed); the 55 mixed-case names and 19 no-GAL clashes left as printed.
+- **Batch 15 pasted 2026-09-26.** Verified: totals 72 / 21,885 / 20,129; all 21 + 6,986 + 6,618 pasted rows equal `Batch15_*.tsv` exactly (gviz CSV compare); every pre-existing row unchanged, including the three Bangkok guard rows; Start Dates are date cells; Scores are text cells (no time conversion); blanks as expected (106 Scores, 5,682 Placements, 1 Match No, 1 Location); site header 72 events · 7,809 athletes · 21,880 results.
+- **Batch 15 calls for Stephen**: is TRAN Nguyen anh ngan (VIE-3059) the same athlete as TRAN NGUYEN Anh ngan (VIE-2281)? Merge the 8 no-GAL names anyway (CORREIA DA SILVA BRA, DASGIN TUR, DIALLO GUI, DIAZ Isabella PUR, DOGRU TUR, DONMEZ TUR, HO Ee Jean MAS, JUNG Jae Hun KOR)? Clean up the ~100 older case-only variants (e.g. GUN Youngsuk Ethan / ethan, NICKOLAS CJ / Cj, McGOWAN Rebecca)?
 - **Batch 14 pasted 2026-09-26.** Verified: totals 51 / 14,899 / 13,511; per event Dutch 1/556/540, Belgian 1/308/292, Muju 1/311/311, Pan Am 1/404/388, Bangkok 1/205/205; every pasted row equals its source TSV; start dates are real dates; site header shows 51 events.
 - **Batch 14 case-only clashes** (kept as printed, Stephen to decide): Dutch 2025 `FARNES Ricki gene`, `KARMELY Lea anais`; Muju GPC many TPE/KOR hyphenated given names (e.g. `CHEN Pen-Ren`) and `PACHECO Maria Clara`; Pan Am `GRIPPOLI Maria Sara`, `PACHECO Maria Clara`, `SOUZA Daniela Paola`.
 - **Muju GPC 2025 truncated names left as printed** (~11, no source to expand from): `BEN ELBACARIA Ah`, `dos SANTOS de ASSI`, `NOAH BEKADA Flori`, `NTYAM LEVODO Da`, `ESCOLAR PARRA Iva`, `SALANOVA LISTE Adr`, `ALBAKER Abed Almaj`, `AL HARBI Mohamme`, `GOMES PEREIRA M`, `RUKUNDO Guy Gerli`, `GROSSI Sophia Cleli`.
