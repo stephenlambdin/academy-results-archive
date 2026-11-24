@@ -715,10 +715,10 @@ function exportAthlete(rk) {
 function isTouchDevice() {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
-function loadScript(src) {
+function loadScript(src, sri) {
   return new Promise((ok, bad) => {
     if (document.querySelector('script[src="' + src + '"]')) return ok();
-    const t = document.createElement("script"); t.src = src; t.onload = ok; t.onerror = () => bad(new Error("could not load " + src));
+    const t = document.createElement("script"); t.src = src; if (sri) { t.integrity = sri; t.crossOrigin = "anonymous"; } t.onload = ok; t.onerror = () => bad(new Error("could not load " + src));
     document.head.appendChild(t);
   });
 }
@@ -730,8 +730,8 @@ function pdfMessage(html) {
 async function phonePdf(h, filename) {
   pdfMessage("<span>Making the PDF…</span>");
   try {
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", "sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js", "sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==");
     let st = document.getElementById("pdfstage");
     if (!st) { st = document.createElement("div"); st.id = "pdfstage"; document.body.appendChild(st); }
     const cut = h.indexOf('<div class="ps-page">');
